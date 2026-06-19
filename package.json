@@ -1,0 +1,202 @@
+{
+  "name": "ai-status-bar",
+  "displayName": "AI Status Bar",
+  "description": "Track Codex, Claude Code, and Devin usage in the VS Code status bar.",
+  "version": "1.0.0",
+  "publisher": "tolbxela",
+  "galleryBanner": {
+    "color": "#111827",
+    "theme": "dark"
+  },
+  "author": {
+    "name": "Tolbxela"
+  },
+  "maintainers": [
+    {
+      "name": "Tolbxela"
+    }
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tolbxela/ai-status-bar.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tolbxela/ai-status-bar/issues"
+  },
+  "homepage": "https://github.com/tolbxela/ai-status-bar#readme",
+  "keywords": [
+    "ai",
+    "ai-agents",
+    "status-bar",
+    "usage",
+    "quota",
+    "rate-limits",
+    "codex",
+    "claude-code",
+    "devin",
+    "developer-tools"
+  ],
+  "icon": "assets/icon.png",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "aiStatusBar.refresh",
+        "title": "AI Status Bar: Refresh"
+      }
+    ],
+    "configuration": [
+      {
+        "title": "AI Status Bar",
+        "properties": {
+          "aiStatusBar.pollSeconds": {
+            "type": "number",
+            "default": 120,
+            "minimum": 30,
+            "description": "How often to poll agent usage APIs, in seconds."
+          },
+          "aiStatusBar.barCells": {
+            "type": "number",
+            "default": 3,
+            "minimum": 3,
+            "maximum": 10,
+            "description": "Number of segments in each status-bar progress bar."
+          },
+          "aiStatusBar.showWeekly": {
+            "type": "boolean",
+            "default": true,
+            "description": "Show the secondary weekly or billing-cycle usage bar in each agent status item. The primary 5-hour or daily bar is otherwise always shown."
+          },
+          "aiStatusBar.replacePrimaryWithWeeklyOnLimit": {
+            "type": "boolean",
+            "default": true,
+            "description": "When the secondary weekly or billing-cycle limit is reached, show that exhausted budget in the primary status-bar slot instead of the 5-hour or daily budget."
+          },
+          "aiStatusBar.presentationMode": {
+            "type": "string",
+            "default": "agentDefault",
+            "enum": [
+              "agentDefault",
+              "used",
+              "remaining"
+            ],
+            "enumDescriptions": [
+              "Use each agent's native display style.",
+              "Show used percentage and gauge segments for all agents.",
+              "Show remaining percentage and gauge segments for all agents."
+            ],
+            "description": "Whether usage gauges display used or remaining percentage."
+          },
+          "aiStatusBar.cautionAt": {
+            "type": "number",
+            "default": 70,
+            "description": "Used percentage at which the status dot turns yellow."
+          },
+          "aiStatusBar.warnAt": {
+            "type": "number",
+            "default": 90,
+            "description": "Used percentage at which the status dot turns red and a warning popup can appear."
+          },
+          "aiStatusBar.locale": {
+            "type": "string",
+            "default": "",
+            "description": "BCP-47 locale for dates/times, for example de-DE. Empty means system locale."
+          }
+        }
+      },
+      {
+        "title": "AI Status Bar: Claude",
+        "properties": {
+          "aiStatusBar.claude.enabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "Enable or disable Claude detection and status display."
+          }
+        }
+      },
+      {
+        "title": "AI Status Bar: Codex",
+        "properties": {
+          "aiStatusBar.codex.enabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "Enable or disable Codex detection and status display."
+          },
+          "aiStatusBar.codex.command": {
+            "type": "string",
+            "default": "codex",
+            "scope": "machine",
+            "description": "Codex command or executable path used to start `codex app-server`."
+          }
+        }
+      },
+      {
+        "title": "AI Status Bar: Devin",
+        "properties": {
+          "aiStatusBar.devin.enabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "Enable or disable Devin detection and status display."
+          },
+          "aiStatusBar.devin.apiKeyEnv": {
+            "type": "string",
+            "default": "DEVIN_API_KEY",
+            "scope": "machine",
+            "description": "Optional environment variable containing a Devin API key for the documented API fallback. Normal Devin IDE usage is read from the local Devin usage cache."
+          },
+          "aiStatusBar.devin.apiBaseUrl": {
+            "type": "string",
+            "default": "https://api.devin.ai",
+            "scope": "machine",
+            "description": "Base URL for the Devin API."
+          },
+          "aiStatusBar.devin.orgId": {
+            "type": "string",
+            "default": "",
+            "scope": "machine",
+            "description": "Devin organization ID. If empty, the extension tries to read it from `/v3/self`."
+          },
+          "aiStatusBar.devin.userId": {
+            "type": "string",
+            "default": "",
+            "scope": "machine",
+            "description": "Devin user ID to query for consumption."
+          },
+          "aiStatusBar.devin.cycleAcuLimit": {
+            "type": "number",
+            "default": 0,
+            "scope": "machine",
+            "description": "Optional Devin cycle ACU/quota limit. If unset or 0, the extension uses the organization cycle limit when the API returns one."
+          },
+          "aiStatusBar.devin.usageFile": {
+            "type": "string",
+            "default": "",
+            "scope": "machine",
+            "description": "Optional local JSON usage file override for Devin usage snapshots."
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "bump:compile": "npm version patch --no-git-tag-version && npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.9.2",
+    "typescript": "^5.4.0"
+  }
+}

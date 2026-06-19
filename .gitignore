@@ -1,0 +1,12 @@
+node_modules/
+out/
+tmp/
+versions/
+.vscode-test/
+*.vsix
+*.zip
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+.env
