@@ -191,6 +191,7 @@
   "scripts": {
     "bump:compile": "npm version patch --no-git-tag-version && npm run compile",
     "compile": "tsc -p ./",
+    "pack": "npm run compile && vsce package",
     "watch": "tsc -watch -p ./"
   },
   "devDependencies": {

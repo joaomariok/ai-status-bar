@@ -1,0 +1,10 @@
+{
+  "project": "AI Status Bar",
+  "tasks": [
+    {
+      "name": "pack-extension",
+      "command": "npm run pack",
+      "category": "Extension"
+    }
+  ]
+}
