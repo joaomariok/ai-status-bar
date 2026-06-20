@@ -12,6 +12,22 @@ When multiple agents are available, they appear side by side in the status bar, 
 
 > Platform note: this extension has only been tested on **Windows**. macOS and Linux support is best-effort: Claude should work if credentials are in the standard location, and Codex should work if `codex app-server` is available on `PATH` or in a known extension install location.
 
+## Status Bar
+
+By default:
+
+- Codex shows remaining usage.
+- Claude shows used usage.
+- Devin shows used quota usage from the local IDE cache.
+
+You can keep those native defaults or force all agents to show either used or remaining percentages with `aiStatusBar.presentationMode`.
+
+Example status-bar shape:
+
+```text
+Codex: 🟢 5h ▰▰▱ 69% · 🟢 wk ▰▰▱ 51%   Claude: 🟢 5h ▰▰▰ 100%   Devin: 🟢 day ▰▰▰ 100%
+```
+
 ## Screenshots
 
 ![AI Status Bar entries with Devin usage hover details](assets/screenshots/status-bar-overview.png)
@@ -80,94 +96,27 @@ Use the command palette commands when needed:
 
 ## How It Works
 
-The extension is built around a small shared core and separate agent providers.
+The extension only collects enough local usage data to show status-bar percentages and hover details.
 
-The shared core owns the generic extension behavior:
+Each agent provider is read-only from the agent's point of view:
 
-- polling and refresh scheduling
-- failure backoff
-- cache reads and writes
-- status-bar rendering
-- hover popup rendering
-- settings lookup
-- warning notifications
+- Codex usage is requested through Codex's local app-server. The extension does not read Codex auth files directly.
+- Claude usage uses the existing local Claude Code sign-in token. The token is kept in memory only and is not written to the extension cache.
+- Devin usage is read from the local IDE usage cache when available. The Devin API fallback is used only when configured with `DEVIN_API_KEY`.
 
-Each provider only knows how to detect and query one agent. This keeps the implementation simple while making it straightforward to add another agent later.
+The extension stores normalized usage snapshots in its own VS Code extension storage so multiple editor windows do not have to repeatedly query the same data. Those snapshots contain usage details, not agent credentials.
 
 ### Codex
 
-The extension starts:
-
-```sh
-codex app-server
-```
-
-Then it calls the local app-server method:
-
-```json
-{ "method": "account/rateLimits/read" }
-```
-
-Codex handles authentication and token refresh. This extension does not read Codex auth files directly.
-
-If a configured or discovered Codex executable fails, the extension backs off before retrying. The executable path setting is machine-scoped so a repository cannot set it through workspace settings.
+Codex handles its own authentication. AI Status Bar asks the local Codex app-server for usage limits and does not inspect Codex credential files.
 
 ### Claude Code
 
-The extension reads the existing Claude Code OAuth token from:
-
-```text
-~/.claude/.credentials.json
-```
-
-Then it calls Claude's usage endpoint with that token. The token is kept in memory only and is never written to the extension cache.
-
-Claude usage is cached as a usage snapshot only. OAuth credentials are not cached.
+Claude Code authentication stays with Claude Code. AI Status Bar uses the existing local sign-in token to request usage, keeps that token in memory only, and caches only the resulting usage snapshot.
 
 ### Devin
 
-Devin usage is metered differently from Claude and Codex. In the Devin IDE, the bundled `codeium.windsurf` extension writes a usage snapshot into Devin's VS Code-style global storage:
-
-```text
-%APPDATA%\devin\User\globalStorage\state.vscdb
-```
-
-This extension reads only the cached plan/usage fields from that local store. No `DEVIN_API_KEY` is needed for the normal Devin IDE case. Because Windsurf was renamed to Devin, it also checks the old Windsurf store as a fallback:
-
-```text
-%APPDATA%\Windsurf\User\globalStorage\state.vscdb
-```
-
-The current Devin cache exposes daily and weekly quota remaining percentages, reset timestamps, plan name, and add-on credit summary. The status bar shows those as `day` and `wk`.
-
-If you explicitly configure `aiStatusBar.devin.usageFile`, that local JSON snapshot is used first. If no local cache or JSON snapshot is available and `DEVIN_API_KEY` is set, the extension can fall back to Devin API v3 consumption endpoints:
-
-```text
-GET /v3/self
-GET /v3/enterprise/consumption/cycles
-GET /v3/enterprise/consumption/daily/users/{user_id}
-GET /v3/enterprise/organizations/{org_id}
-```
-
-For that API fallback, set `aiStatusBar.devin.userId` to the Devin user ID whose consumption should be shown. If `/v3/self` cannot determine the organization, also set `aiStatusBar.devin.orgId`. The API fallback shows today's consumption as `day` and the current billing cycle as `cy`.
-
-`aiStatusBar.devin.usageFile` can point at a local JSON snapshot using the same normalized shape as the extension cache, for example `fiveHour.usedPercent`, `weekly.usedPercent`, `credits.text`, and `plan`.
-
-## Status Bar
-
-By default:
-
-- Codex shows remaining usage.
-- Claude shows used usage.
-- Devin shows used quota usage from the local IDE cache.
-
-You can keep those native defaults or force all agents to show either used or remaining percentages with `aiStatusBar.presentationMode`.
-
-Example status-bar shape:
-
-```text
-Codex: 🟢 5h ▰▰▱ 69% · 🟢 wk ▰▰▱ 51%   Claude: 🟢 5h ▰▰▰ 100%   Devin: 🟢 day ▰▰▰ 100%
-```
+For the normal Devin IDE case, AI Status Bar reads only the cached plan and usage fields already stored locally by Devin. No `DEVIN_API_KEY` is needed unless you choose to use the API fallback.
 
 ## Settings
 
