@@ -9,6 +9,7 @@ Start here, then load only the document you need.
 | [development.md](development.md) | Local setup, the watch loop, F5 debugging, the gate, and how tests are structured. |
 | [build-and-release.md](build-and-release.md) | Versioning, packaging with `vsce`, what ships in the `.vsix`. |
 | [next-steps.md](next-steps.md) | Deliberately out-of-scope tooling and known debt. |
+| [icons.md](icons.md) | Where the status bar brand icon font comes from and how to regenerate it. |
 
 ## Quick pointers
 

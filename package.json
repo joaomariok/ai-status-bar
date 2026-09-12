@@ -54,6 +54,22 @@
         "title": "AI Status Bar: Refresh"
       }
     ],
+    "icons": {
+      "ai-status-bar-claude": {
+        "description": "Claude brand mark",
+        "default": {
+          "fontPath": "./assets/icons/ai-status-bar-icons.woff",
+          "fontCharacter": "\\E001"
+        }
+      },
+      "ai-status-bar-codex": {
+        "description": "Codex (OpenAI) brand mark",
+        "default": {
+          "fontPath": "./assets/icons/ai-status-bar-icons.woff",
+          "fontCharacter": "\\E002"
+        }
+      }
+    },
     "configuration": [
       {
         "title": "AI Status Bar",
@@ -95,6 +111,21 @@
               "Show remaining percentage and gauge segments for all agents."
             ],
             "description": "Whether usage gauges display used or remaining percentage."
+          },
+          "aiStatusBar.agentNameStyle": {
+            "type": "string",
+            "default": "both",
+            "enum": [
+              "text",
+              "icon",
+              "both"
+            ],
+            "enumDescriptions": [
+              "Show only the agent name, for example \"Claude: ...\".",
+              "Show only the agent's brand icon, dropping the name.",
+              "Show the brand icon followed by the agent name."
+            ],
+            "description": "How each agent is identified at the start of its status-bar item."
           },
           "aiStatusBar.statusBarStyle": {
             "type": "string",

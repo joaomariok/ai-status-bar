@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { AgentSettings, StatusBarStyle } from './types';
+import { AgentNameStyle, AgentSettings, StatusBarStyle } from './types';
 import { CAUTION_AT, WARN_AT } from './format';
 
 const CONFIG_SECTION = 'aiStatusBar';
@@ -21,6 +21,7 @@ export function getSettings(): AgentSettings {
     locale: cfg.get<string>('locale') || undefined,
     presentationMode: cfg.get<'agentDefault' | 'used' | 'remaining'>('presentationMode') ?? 'agentDefault',
     statusBarStyle: cfg.get<StatusBarStyle>('statusBarStyle') ?? 'full',
+    agentNameStyle: cfg.get<AgentNameStyle>('agentNameStyle') ?? 'both',
   };
 }
 

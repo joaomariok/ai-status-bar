@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { dot, escapeMarkdown, formatReset, meter, money, pctShort, presentationPercent, statusPart } from './format';
+import { agentPrefix, dot, escapeMarkdown, formatReset, meter, money, pctShort, presentationPercent, statusPart } from './format';
 import { AgentProvider, AgentSettings, AgentUsage, PresentationMode, UsageWindow } from './types';
 
 export interface RenderInput {
@@ -41,7 +41,8 @@ export function renderStatus(input: RenderInput): { text: string; tooltip: strin
     }
   }
 
-  const text = (parts.length ? `${provider.label}: ${parts.join(' · ')}` : provider.label) +
+  const prefix = agentPrefix(provider.label, provider.icon, settings.agentNameStyle);
+  const text = (parts.length ? `${prefix}${parts.join(' · ')}` : provider.label) +
     (note ? ' $(warning)' : '');
 
   return {

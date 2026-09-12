@@ -1,6 +1,7 @@
 export type PresentationMode = 'used' | 'remaining';
 export type ConfiguredPresentationMode = PresentationMode | 'agentDefault';
 export type StatusBarStyle = 'full' | 'compact';
+export type AgentNameStyle = 'text' | 'icon' | 'both';
 
 export interface AgentDetection {
   available: boolean;
@@ -33,6 +34,7 @@ export interface AgentUsage {
 export interface AgentProvider {
   readonly id: string;
   readonly label: string;
+  readonly icon: string;
   readonly tooltipTitle: string;
   readonly defaultPresentationMode: PresentationMode;
   readonly windowLabels?: {
@@ -59,4 +61,5 @@ export interface AgentSettings {
   locale: string | undefined;
   presentationMode: ConfiguredPresentationMode;
   statusBarStyle: StatusBarStyle;
+  agentNameStyle: AgentNameStyle;
 }

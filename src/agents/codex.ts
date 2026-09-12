@@ -38,6 +38,7 @@ interface RateLimitsResponse {
 export class CodexProvider implements AgentProvider {
   readonly id = 'codex';
   readonly label = 'Codex';
+  readonly icon = 'ai-status-bar-codex';
   readonly tooltipTitle = 'Codex';
   readonly defaultPresentationMode = 'remaining';
   private readonly activeProcesses = new Set<ChildProcess>();

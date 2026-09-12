@@ -1,6 +1,7 @@
 import * as assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
+  agentPrefix,
   clampPercent,
   dot,
   escapeMarkdown,
@@ -144,6 +145,18 @@ test('statusPart applies warn threshold dot in compact style', () => {
     statusPart('5h', 95, { style: 'compact', mode: 'used', cells: 3, cautionAt: 70, warnAt: 90 }),
     '🔴 5h: 95%',
   );
+});
+
+test('agentPrefix renders the name alone in text style', () => {
+  assert.equal(agentPrefix('Claude', 'ai-status-bar-claude', 'text'), 'Claude: ');
+});
+
+test('agentPrefix renders the icon alone in icon style, dot-separated like the usage windows', () => {
+  assert.equal(agentPrefix('Claude', 'ai-status-bar-claude', 'icon'), '$(ai-status-bar-claude) · ');
+});
+
+test('agentPrefix renders the icon and the name in both style', () => {
+  assert.equal(agentPrefix('Claude', 'ai-status-bar-claude', 'both'), '$(ai-status-bar-claude) Claude: ');
 });
 
 test('escapeMarkdown escapes markdown-significant characters', () => {

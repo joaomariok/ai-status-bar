@@ -25,6 +25,7 @@ interface ClaudeUsagePayload {
 export class ClaudeProvider implements AgentProvider {
   readonly id = 'claude';
   readonly label = 'Claude';
+  readonly icon = 'ai-status-bar-claude';
   readonly tooltipTitle = 'Claude Code';
   readonly defaultPresentationMode = 'used';
 

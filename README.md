@@ -20,16 +20,21 @@ By default:
 
 You can keep those native defaults or force all agents to show either used or remaining percentages with `aiStatusBar.presentationMode`.
 
-Example status-bar shape:
+Each agent is prefixed with its brand icon by default. Example status-bar shape
+(`[codex]`/`[claude]` stand in for the rendered icons):
 
 ```text
-Codex: 🟢 5h ▰▰▱ 69% · 🟢 wk ▰▰▱ 51%   Claude: 🟢 5h ▰▰▰ 100%
+[codex] Codex: 🟢 5h ▰▰▱ 69% · 🟢 wk ▰▰▱ 51%   [claude] Claude: 🟢 5h ▰▰▰ 100%
 ```
+
+Set `aiStatusBar.agentNameStyle` to `icon` to drop the name and keep only the icon
+(dot-separated from the usage windows, like `[codex] · 🟢 5h ▰▰▱ 69% · 🟢 wk ▰▰▱ 51%`),
+or to `text` to go back to name-only with no icon.
 
 Set `aiStatusBar.statusBarStyle` to `compact` for a narrower status bar that drops the gauges and shows just the percentages:
 
 ```text
-Codex: 🟢 5h: 69% · 🟢 wk: 51%   Claude: 🟢 5h: 100%
+[codex] Codex: 🟢 5h: 69% · 🟢 wk: 51%   [claude] Claude: 🟢 5h: 100%
 ```
 
 ## Screenshots
@@ -123,6 +128,7 @@ All settings are under `aiStatusBar`.
 | `pollSeconds` | `120` | How often to refresh usage data. |
 | `barCells` | `3` | Number of segments in the status-bar gauge (`statusBarStyle: full` only). |
 | `statusBarStyle` | `full` | `full` (gauge + percentage) or `compact` (percentage only, no gauge). Does not affect the hover tooltip. |
+| `agentNameStyle` | `both` | `text` (name only), `icon` (brand icon only), or `both` (icon + name) at the start of each status-bar item. |
 | `showWeekly` | `true` | Show the secondary weekly or billing-cycle usage window. The primary 5-hour or daily window is otherwise always shown. |
 | `replacePrimaryWithWeeklyOnLimit` | `true` | When the secondary weekly or billing-cycle limit is reached, show that exhausted budget in the primary status-bar slot instead of the 5-hour or daily budget. |
 | `presentationMode` | `agentDefault` | `agentDefault`, `used`, or `remaining`. |
@@ -217,3 +223,6 @@ See `PRIVACY.md` for local data notes and `CHANGELOG.md` for release history.
 - Claude usage uses an internal/undocumented endpoint and may break if Claude changes it.
 - Codex support depends on the local `codex app-server` protocol.
 - Windows is the only tested platform at this time.
+- The Claude and Codex status-bar icons are unmodified monochrome marks from a
+  third-party icon pack, used nominatively to identify the products whose usage is
+  shown; see [docs/icons.md](docs/icons.md) for sources.

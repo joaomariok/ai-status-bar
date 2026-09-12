@@ -1,4 +1,4 @@
-import { PresentationMode, StatusBarStyle } from './types';
+import { AgentNameStyle, PresentationMode, StatusBarStyle } from './types';
 
 export const CAUTION_AT = 70;
 export const WARN_AT = 90;
@@ -77,6 +77,18 @@ export function statusPart(
   return opts.style === 'compact'
     ? `${dotGlyph} ${label}: ${pctShort(display)}`
     : `${dotGlyph} ${label} ${meter(display, opts.cells)} ${pctShort(display)}`;
+}
+
+export function agentPrefix(label: string, icon: string, style: AgentNameStyle): string {
+  switch (style) {
+    case 'icon':
+      return `$(${icon}) · `;
+    case 'both':
+      return `$(${icon}) ${label}: `;
+    case 'text':
+    default:
+      return `${label}: `;
+  }
 }
 
 export function escapeMarkdown(value: string | undefined): string {
