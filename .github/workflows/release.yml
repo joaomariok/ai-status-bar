@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Check tag matches package.json version
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          tag_version="${GITHUB_REF_NAME#v}"
+          manifest_version="$(node -p "require('./package.json').version")"
+          if [ "$tag_version" != "$manifest_version" ]; then
+            echo "Tag $GITHUB_REF_NAME (version $tag_version) does not match package.json version $manifest_version" >&2
+            exit 1
+          fi
+
+      - run: npm run gate
+
+      - run: npm run pack
+
+      - name: Prepare release notes
+        if: startsWith(github.ref, 'refs/tags/')
+        run: node scripts/releasenotes.mjs "${GITHUB_REF_NAME#v}" > release-notes.md
+
+      - name: Upload .vsix as workflow artifact
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: vsix
+          path: ai-status-bar-*.vsix
+
+      - name: Create GitHub release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" ai-status-bar-*.vsix \
+            --title "AI Status Bar $GITHUB_REF_NAME" \
+            --notes-file release-notes.md

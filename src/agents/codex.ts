@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as readline from 'readline';
 import { getBool, getString } from '../shared/settings';
 import { AgentDetection, AgentProvider, AgentUsage } from '../shared/types';
+import { getExtensionVersion } from '../shared/version';
 
 const START_TIMEOUT_MS = 15_000;
 const REQUEST_TIMEOUT_MS = 30_000;
@@ -303,7 +304,7 @@ function fetchCodexRateLimits(
         clientInfo: {
           name: 'ai_status_bar',
           title: 'AI Status Bar',
-          version: '1.0.0',
+          version: getExtensionVersion(),
         },
         capabilities: {
           experimentalApi: true,

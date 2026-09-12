@@ -3,7 +3,6 @@
 Deliberately left out of the doc bootstrap:
 
 - **Linter/formatter**: no existing convention; adding one would touch every file for formatting. Consider ESLint if the fork grows.
-- **CI**: none exists. `npm run gate` is already the exact command to wire into a GitHub Actions workflow.
 
 ## Known debt (not fixed, out of scope for the bootstrap)
 

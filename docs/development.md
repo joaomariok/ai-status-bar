@@ -59,10 +59,11 @@ npm run gate
 ```
 
 Runs `scripts/gate.mjs`, which chains: typecheck → tests → packaging dry-run
-(`vsce ls` / `vsce package` against a scratch directory — never writes a
-`.vsix` into the repo). It stops at the first failing step and prints which
-step failed. This is the closest local equivalent to CI (there is no CI
-workflow in this repository); run it before considering a change complete.
+(`vsce ls`, which lists exactly what would be packaged without writing a
+`.vsix`). It stops at the first failing step and prints which step failed.
+This is the same sequence run by the release workflow
+(`.github/workflows/release.yml`) before it packages a release; run it
+locally before considering a change complete.
 
 ## Other scripts
 
@@ -72,3 +73,4 @@ workflow in this repository); run it before considering a change complete.
 | `npm run typecheck` | `tsc --noEmit -p ./` — fast check, no `out/` written. |
 | `npm run clean` | Removes `out/` and any stray `*.vsix` from the repo root. |
 | `npm run pack` | Compiles then runs `vsce package` — produces the real `.vsix` (see [build-and-release.md](build-and-release.md)). |
+| `npm run bump:patch:compile` / `npm run bump:minor:compile` | Bumps `package.json`'s version (patch or minor) without a git tag/commit, then recompiles (see [build-and-release.md](build-and-release.md#versioning)). |

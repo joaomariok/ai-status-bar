@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Local pre-submit validation: the closest equivalent to CI in this
-// repository (there is no CI workflow). Runs typecheck -> tests -> a
-// packaging dry-run, stopping at the first failure.
+// Local pre-submit validation, and the same steps the release workflow
+// (.github/workflows/release.yml) runs before packaging. Runs typecheck ->
+// tests -> a packaging dry-run, stopping at the first failure.
 import { spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

@@ -77,10 +77,10 @@ It also replaces separate status-bar experiments with one shared implementation.
 
 ## How To Use It
 
-1. Install AI Status Bar from your editor's extension marketplace once published, or install a local `.vsix` build:
+1. Download the latest `ai-status-bar-<version>.vsix` from the [GitHub Releases page](https://github.com/joaomariok/ai-status-bar/releases), or build one locally (see [Build](#build)), then install it:
 
    ```sh
-   code --install-extension ai-status-bar-1.0.0.vsix --force
+   code --install-extension ai-status-bar-<version>.vsix --force
    ```
 
 2. Make sure the agents you want to monitor are signed in and usable:
@@ -215,14 +215,13 @@ Security choices:
 
 ```sh
 npm install
-npm run compile
-npx @vscode/vsce package
+npm run pack
 ```
 
 The generated `.vsix` can be installed with:
 
 ```sh
-code --install-extension ai-status-bar-1.0.0.vsix --force
+code --install-extension ai-status-bar-<version>.vsix --force
 ```
 
 See `PRIVACY.md` for local data notes and `CHANGELOG.md` for release history.

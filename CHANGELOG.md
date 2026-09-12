@@ -1,9 +1,16 @@
 # Changelog
 
-## Unreleased
+## 1.1.0 - 2026-09-12
 
 - Added an "AI Usage" activity-bar panel that mirrors the status-bar tooltips with always-visible, proportional usage bars.
+- Added a compact status-bar style (`aiStatusBar.statusBarStyle`) showing percentage only, without gauges.
+- Added per-agent brand icons (`aiStatusBar.agentNameStyle`).
 - Removed Devin usage monitoring, its settings, and its API fallback.
+- Changed the publisher to `joaomariok` and added fork copyright.
+- Pinned `@types/vscode` and resolved npm audit advisories.
+- Fixed the Codex app-server handshake to report the real extension version instead of a hardcoded `1.0.0`.
+- Added tag-driven GitHub Release automation — each release now publishes a downloadable `.vsix` on the Releases page.
+- Added repository docs (`docs/`), the `npm run gate` verification script, and dev tooling.
 
 ## 1.0.0 - 2026-06-20
 

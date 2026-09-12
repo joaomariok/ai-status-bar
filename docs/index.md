@@ -7,7 +7,7 @@ Start here, then load only the document you need.
 | [architecture.md](architecture.md) | How activation, polling, caching, backoff, and rendering fit together; the `AgentProvider` contract shared by all agents. |
 | [agent-providers.md](agent-providers.md) | How Codex and Claude Code usage is actually obtained (protocols, file locations, quirks). |
 | [development.md](development.md) | Local setup, the watch loop, F5 debugging, the gate, and how tests are structured. |
-| [build-and-release.md](build-and-release.md) | Versioning, packaging with `vsce`, what ships in the `.vsix`. |
+| [build-and-release.md](build-and-release.md) | Versioning, packaging with `vsce`, what ships in the `.vsix`, and the tag-triggered GitHub Release workflow. |
 | [next-steps.md](next-steps.md) | Deliberately out-of-scope tooling and known debt. |
 | [icons.md](icons.md) | Where the status bar brand icon font comes from and how to regenerate it. |
 
