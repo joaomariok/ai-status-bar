@@ -11,6 +11,14 @@
         "isDefault": true
       },
       "label": "npm: watch"
+    },
+    {
+      "type": "npm",
+      "script": "install:local",
+      "problemMatcher": [],
+      "group": "build",
+      "label": "npm: install:local",
+      "detail": "Compile, package, and install the extension into this VS Code."
     }
   ]
 }

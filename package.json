@@ -220,6 +220,7 @@
     "clean": "node scripts/clean.mjs",
     "compile": "tsc -p ./",
     "gate": "node scripts/gate.mjs",
+    "install:local": "node scripts/install-local.mjs",
     "pack": "npm run compile && vsce package",
     "test": "npm run compile && node --test out/test/*.test.js",
     "typecheck": "tsc --noEmit -p ./",
