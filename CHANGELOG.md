@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1 - 2026-09-12
+
+- Fixed release-notes extraction to parse changelog headings without regex.
+- Added an `install:local` script and VS Code task to install the built extension locally.
+
 ## 1.1.0 - 2026-09-12
 
 - Added an "AI Usage" activity-bar panel that mirrors the status-bar tooltips with always-visible, proportional usage bars.
