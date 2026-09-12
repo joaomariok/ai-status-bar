@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { agentPrefix, dot, escapeMarkdown, formatReset, meter, money, pctShort, presentationPercent, statusPart } from './format';
 import { AgentProvider, AgentSettings, AgentUsage, PresentationMode, UsageWindow } from './types';
+import { resolveWindowLabel } from './windowLabels';
 
 export interface RenderInput {
   provider: AgentProvider;
@@ -33,11 +34,11 @@ export function renderStatus(input: RenderInput): { text: string; tooltip: strin
     settings.replacePrimaryWithWeeklyOnLimit && isWindowLimitReached(usage.weekly);
 
   if (replacePrimaryWithWeekly) {
-    parts.push(renderBarPart(windowLabels?.weekly ?? 'wk', usage.weekly, mode, settings));
+    parts.push(renderBarPart(resolveWindowLabel(windowLabels, 'weekly'), usage.weekly, mode, settings));
   } else {
-    parts.push(renderBarPart(windowLabels?.fiveHour ?? '5h', usage.fiveHour, mode, settings));
+    parts.push(renderBarPart(resolveWindowLabel(windowLabels, 'fiveHour'), usage.fiveHour, mode, settings));
     if (settings.showWeekly) {
-      parts.push(renderBarPart(windowLabels?.weekly ?? 'wk', usage.weekly, mode, settings));
+      parts.push(renderBarPart(resolveWindowLabel(windowLabels, 'weekly'), usage.weekly, mode, settings));
     }
   }
 

@@ -90,10 +90,10 @@ implements `isEnabled()`, `detect()`, `fetchUsage()`, and declares
 windows.** They're rendered as "primary" and "secondary" gauges regardless of
 what they actually represent. Label resolution order is
 `usage.windowLabels ?? provider.windowLabels ?? hardcoded default`
-([renderer.ts](../src/shared/renderer.ts) L30) — a per-fetch `windowLabels` on
+([windowLabels.ts](../src/shared/windowLabels.ts)) — a per-fetch `windowLabels` on
 the returned `AgentUsage` would override a provider's static `windowLabels`,
 but neither current provider (Codex, Claude) uses this override; both rely on
-the hardcoded `5h`/`wk` default.
+the hardcoded `5h`/`7d` default.
 
 `replacePrimaryWithWeeklyOnLimit` (a global setting) swaps which slot renders
 in the primary status-bar position when the secondary window's `usedPercent`
