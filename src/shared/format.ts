@@ -17,7 +17,12 @@ export function pctShort(value: number | undefined): string {
   return value === undefined ? '-' : `${Math.round(value)}%`;
 }
 
-export function meter(value: number | undefined, cells = 10, fill = '▰', empty = '▱'): string {
+export function meter(
+  value: number | undefined,
+  cells = 10,
+  fill = '▰',
+  empty = '▱',
+): string {
   if (value === undefined) return empty.repeat(cells);
   const filled = Math.round((clampPercent(value) / 100) * cells);
   return fill.repeat(filled) + empty.repeat(cells - filled);
@@ -36,19 +41,31 @@ export function presentationPercent(
 
 export type Severity = 'none' | 'ok' | 'caution' | 'warn';
 
-export function severity(used: number | undefined, caution = CAUTION_AT, warn = WARN_AT): Severity {
+export function severity(
+  used: number | undefined,
+  caution = CAUTION_AT,
+  warn = WARN_AT,
+): Severity {
   if (used === undefined) return 'none';
   if (used >= warn) return 'warn';
   if (used >= caution) return 'caution';
   return 'ok';
 }
 
-export function dot(used: number | undefined, caution = CAUTION_AT, warn = WARN_AT): string {
+export function dot(
+  used: number | undefined,
+  caution = CAUTION_AT,
+  warn = WARN_AT,
+): string {
   switch (severity(used, caution, warn)) {
-    case 'none': return '○';
-    case 'warn': return '🔴';
-    case 'caution': return '🟡';
-    default: return '🟢';
+    case 'none':
+      return '○';
+    case 'warn':
+      return '🔴';
+    case 'caution':
+      return '🟡';
+    default:
+      return '🟢';
   }
 }
 
@@ -58,7 +75,8 @@ export function formatReset(
   withDate: boolean,
 ): string {
   if (value === null || value === undefined || value === '') return '';
-  const date = typeof value === 'number' ? new Date(value * 1000) : new Date(value);
+  const date =
+    typeof value === 'number' ? new Date(value * 1000) : new Date(value);
   if (Number.isNaN(date.getTime())) return '';
 
   return withDate
@@ -90,7 +108,11 @@ export function statusPart(
     : `${dotGlyph} ${label} ${meter(display, opts.cells)} ${pctShort(display)}`;
 }
 
-export function agentPrefix(label: string, icon: string, style: AgentNameStyle): string {
+export function agentPrefix(
+  label: string,
+  icon: string,
+  style: AgentNameStyle,
+): string {
   switch (style) {
     case 'icon':
       return `$(${icon}) · `;

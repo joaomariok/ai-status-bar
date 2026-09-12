@@ -1,5 +1,19 @@
-import { formatReset, money, pctShort, presentationPercent, severity, Severity } from './format';
-import { AgentSettings, AgentSnapshot, AgentSnapshotState, AgentUsage, PresentationMode, UsageWindow } from './types';
+import {
+  formatReset,
+  money,
+  pctShort,
+  presentationPercent,
+  severity,
+  Severity,
+} from './format';
+import {
+  AgentSettings,
+  AgentSnapshot,
+  AgentSnapshotState,
+  AgentUsage,
+  PresentationMode,
+  UsageWindow,
+} from './types';
 
 export interface PanelWindowRow {
   label: string;
@@ -11,7 +25,13 @@ export interface PanelWindowRow {
 
 export type PanelCredits =
   | { kind: 'text'; text: string }
-  | { kind: 'gauge'; pctText: string; displayPercent: number | undefined; severityLevel: Severity; amountText: string };
+  | {
+      kind: 'gauge';
+      pctText: string;
+      displayPercent: number | undefined;
+      severityLevel: Severity;
+      amountText: string;
+    };
 
 export type PanelFooter =
   | { kind: 'updated'; timeText: string }
@@ -41,11 +61,19 @@ export interface PanelModel {
  * a vscode.MarkdownString, so it can be rendered as HTML and unit-tested
  * without importing `vscode`.
  */
-export function buildPanelModel(snapshots: AgentSnapshot[], settings: AgentSettings): PanelModel {
-  return { agents: snapshots.map((snapshot) => buildEntry(snapshot, settings)) };
+export function buildPanelModel(
+  snapshots: AgentSnapshot[],
+  settings: AgentSettings,
+): PanelModel {
+  return {
+    agents: snapshots.map((snapshot) => buildEntry(snapshot, settings)),
+  };
 }
 
-function buildEntry(snapshot: AgentSnapshot, settings: AgentSettings): AgentPanelEntry {
+function buildEntry(
+  snapshot: AgentSnapshot,
+  settings: AgentSettings,
+): AgentPanelEntry {
   const base = {
     providerId: snapshot.providerId,
     label: snapshot.label,
@@ -57,11 +85,20 @@ function buildEntry(snapshot: AgentSnapshot, settings: AgentSettings): AgentPane
   };
 
   if (snapshot.state !== 'ok') {
-    return { ...base, message: snapshot.state === 'disabled' ? 'Disabled' : (snapshot.note ?? 'Unavailable') };
+    return {
+      ...base,
+      message:
+        snapshot.state === 'disabled'
+          ? 'Disabled'
+          : (snapshot.note ?? 'Unavailable'),
+    };
   }
 
   if (!snapshot.usage) {
-    return { ...base, message: snapshot.note ?? `Fetching ${snapshot.label} usage...` };
+    return {
+      ...base,
+      message: snapshot.note ?? `Fetching ${snapshot.label} usage...`,
+    };
   }
 
   const usage = snapshot.usage;
@@ -93,7 +130,10 @@ function buildEntry(snapshot: AgentSnapshot, settings: AgentSettings): AgentPane
   };
 }
 
-function resolveMode(snapshot: AgentSnapshot, settings: AgentSettings): PresentationMode {
+function resolveMode(
+  snapshot: AgentSnapshot,
+  settings: AgentSettings,
+): PresentationMode {
   return settings.presentationMode === 'agentDefault'
     ? snapshot.defaultPresentationMode
     : settings.presentationMode;
@@ -111,12 +151,20 @@ function buildWindowRow(
     label,
     pctText: pctShort(display),
     displayPercent: display,
-    severityLevel: severity(win?.usedPercent, settings.cautionAt, settings.warnAt),
+    severityLevel: severity(
+      win?.usedPercent,
+      settings.cautionAt,
+      settings.warnAt,
+    ),
     resetText: formatReset(win?.resetsAt, settings.locale, withDate),
   };
 }
 
-function buildCredits(usage: AgentUsage, mode: PresentationMode, settings: AgentSettings): PanelCredits | undefined {
+function buildCredits(
+  usage: AgentUsage,
+  mode: PresentationMode,
+  settings: AgentSettings,
+): PanelCredits | undefined {
   const credits = usage.credits;
   if (!credits) return undefined;
 
@@ -138,13 +186,26 @@ function buildCredits(usage: AgentUsage, mode: PresentationMode, settings: Agent
     kind: 'gauge',
     pctText: pctShort(display),
     displayPercent: display,
-    severityLevel: severity(credits.usedPercent, settings.cautionAt, settings.warnAt),
+    severityLevel: severity(
+      credits.usedPercent,
+      settings.cautionAt,
+      settings.warnAt,
+    ),
     amountText: `${money(credits.used, credits.currency, credits.decimals)} / ${money(credits.limit, credits.currency, credits.decimals)}`,
   };
 }
 
-function buildFooter(updatedAt: Date | undefined, note: string | undefined, settings: AgentSettings): PanelFooter | undefined {
+function buildFooter(
+  updatedAt: Date | undefined,
+  note: string | undefined,
+  settings: AgentSettings,
+): PanelFooter | undefined {
   if (!updatedAt) return undefined;
-  const timeText = updatedAt.toLocaleTimeString(settings.locale, { hour: '2-digit', minute: '2-digit' });
-  return note ? { kind: 'note', noteText: note, timeText } : { kind: 'updated', timeText };
+  const timeText = updatedAt.toLocaleTimeString(settings.locale, {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+  return note
+    ? { kind: 'note', noteText: note, timeText }
+    : { kind: 'updated', timeText };
 }

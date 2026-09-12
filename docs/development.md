@@ -7,8 +7,8 @@ npm install
 ```
 
 No project Python/other-language environment is used; this is a pure
-TypeScript/Node project. Requires Node compatible with `@types/node@^20`
-(Node 20+) and `vscode-engines ^1.85.0`.
+TypeScript/Node project. Requires Node `20.19.0+`, compatible with
+`@types/node@^20`, and `vscode-engines ^1.85.0`.
 
 ## Watch loop
 
@@ -76,9 +76,10 @@ under `node --test`.
 npm run gate
 ```
 
-Runs `scripts/gate.mjs`, which chains: typecheck → tests → packaging dry-run
-(`vsce ls`, which lists exactly what would be packaged without writing a
-`.vsix`). It stops at the first failing step and prints which step failed.
+Runs `scripts/gate.mjs`, which chains: lint → format check → typecheck → tests
+→ packaging dry-run (`vsce ls`, which lists exactly what would be packaged
+without writing a `.vsix`). It stops at the first failing step and prints which
+step failed.
 This is the same sequence run by the release workflow
 (`.github/workflows/release.yml`) before it packages a release; run it
 locally before considering a change complete.
@@ -88,6 +89,9 @@ locally before considering a change complete.
 | Script | Does |
 | --- | --- |
 | `npm run compile` | One-shot `tsc -p ./`. |
+| `npm run lint` | Run ESLint's recommended checks over TypeScript source and tests. |
+| `npm run format:check` | Verify Prettier formatting for code and configuration files. |
+| `npm run format` | Apply Prettier formatting to code and configuration files. |
 | `npm run typecheck` | `tsc --noEmit -p ./` — fast check, no `out/` written. |
 | `npm run clean` | Removes `out/` and any stray `*.vsix` from the repo root. |
 | `npm run pack` | Compiles then runs `vsce package` — produces the real `.vsix` (see [build-and-release.md](build-and-release.md)). |

@@ -23,7 +23,11 @@ const useShell = process.platform === 'win32';
 function run(name, command, args) {
   console.log(`> ${name}`);
   const result = useShell
-    ? spawnSync([command, ...args].join(' '), { cwd: repoRoot, stdio: 'inherit', shell: true })
+    ? spawnSync([command, ...args].join(' '), {
+        cwd: repoRoot,
+        stdio: 'inherit',
+        shell: true,
+      })
     : spawnSync(command, args, { cwd: repoRoot, stdio: 'inherit' });
   return result;
 }
@@ -42,27 +46,38 @@ try {
   tmpDir = mkdtempSync(join(tmpdir(), 'ai-status-bar-vsix-'));
   const vsixPath = join(tmpDir, `ai-status-bar-${pkg.version}.vsix`);
 
-  const packageResult = run('package', 'npx', ['vsce', 'package', '--out', vsixPath]);
+  const packageResult = run('package', 'npx', [
+    'vsce',
+    'package',
+    '--out',
+    vsixPath,
+  ]);
   if (packageResult.error || packageResult.status !== 0) {
     console.error('\nFailed at step: package');
     process.exit(packageResult.status ?? 1);
   }
   console.log('✓ package\n');
 
-  const installResult = run('install', 'code', ['--install-extension', vsixPath, '--force']);
+  const installResult = run('install', 'code', [
+    '--install-extension',
+    vsixPath,
+    '--force',
+  ]);
   if (installResult.error || installResult.status !== 0) {
     console.error(
-      "\nFailed at step: install\n" +
+      '\nFailed at step: install\n' +
         "Could not run 'code'. Make sure the VS Code 'code' CLI is on your PATH: " +
-        "open the command palette in VS Code and run " +
-        "\"Shell Command: Install 'code' command in PATH\", then try again."
+        'open the command palette in VS Code and run ' +
+        '"Shell Command: Install \'code\' command in PATH", then try again.',
     );
     process.exit(installResult.status ?? 1);
   }
   console.log('✓ install\n');
 
   console.log(`Installed ${pkg.publisher}.${pkg.name}@${pkg.version}.`);
-  console.log("Reload your VS Code window (\"Developer: Reload Window\") to pick up the new build.");
+  console.log(
+    'Reload your VS Code window ("Developer: Reload Window") to pick up the new build.',
+  );
 } finally {
   if (tmpDir) {
     rmSync(tmpDir, { recursive: true, force: true });

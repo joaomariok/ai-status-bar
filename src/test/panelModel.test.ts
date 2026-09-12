@@ -48,13 +48,22 @@ test('an unavailable snapshot surfaces the detection reason as the message', () 
 });
 
 test('an ok snapshot with no usage yet shows a fetching message', () => {
-  const model = buildPanelModel([snapshot({ state: 'ok', usage: undefined })], settings());
+  const model = buildPanelModel(
+    [snapshot({ state: 'ok', usage: undefined })],
+    settings(),
+  );
   assert.equal(model.agents[0].message, 'Fetching Claude usage...');
 });
 
 test('an ok snapshot with a note but no usage yet surfaces the note as the message', () => {
   const model = buildPanelModel(
-    [snapshot({ state: 'ok', usage: undefined, note: 'fetch failed (timeout)' })],
+    [
+      snapshot({
+        state: 'ok',
+        usage: undefined,
+        note: 'fetch failed (timeout)',
+      }),
+    ],
     settings(),
   );
   assert.equal(model.agents[0].message, 'fetch failed (timeout)');
@@ -94,7 +103,12 @@ test('inverts percentages to remaining when the setting forces remaining mode', 
 
 test('agentDefault presentation mode falls back to the snapshot default', () => {
   const model = buildPanelModel(
-    [snapshot({ defaultPresentationMode: 'remaining', usage: { fiveHour: { usedPercent: 30 } } })],
+    [
+      snapshot({
+        defaultPresentationMode: 'remaining',
+        usage: { fiveHour: { usedPercent: 30 } },
+      }),
+    ],
     settings({ presentationMode: 'agentDefault' }),
   );
   assert.equal(model.agents[0].windows[0].pctText, '70%');
@@ -120,7 +134,11 @@ test('window labels and reset-with-date overrides from the provider are honored'
   const model = buildPanelModel(
     [
       snapshot({
-        windowLabels: { fiveHourTooltip: 'Daily', weeklyTooltip: 'Monthly', fiveHourResetWithDate: true },
+        windowLabels: {
+          fiveHourTooltip: 'Daily',
+          weeklyTooltip: 'Monthly',
+          fiveHourResetWithDate: true,
+        },
         usage: {
           fiveHour: { usedPercent: 10, resetsAt: '2024-03-15T14:30:00.000Z' },
           weekly: { usedPercent: 20 },
@@ -136,7 +154,11 @@ test('window labels and reset-with-date overrides from the provider are honored'
 
 test('limitReached is surfaced from usage', () => {
   const model = buildPanelModel(
-    [snapshot({ usage: { fiveHour: { usedPercent: 100 }, limitReached: true } })],
+    [
+      snapshot({
+        usage: { fiveHour: { usedPercent: 100 }, limitReached: true },
+      }),
+    ],
     settings(),
   );
   assert.equal(model.agents[0].limitReached, true);
@@ -152,10 +174,20 @@ test('plan is surfaced from usage', () => {
 
 test('credits with a text field render as a text credits entry', () => {
   const model = buildPanelModel(
-    [snapshot({ usage: { fiveHour: { usedPercent: 10 }, credits: { text: 'available' } } })],
+    [
+      snapshot({
+        usage: {
+          fiveHour: { usedPercent: 10 },
+          credits: { text: 'available' },
+        },
+      }),
+    ],
     settings(),
   );
-  assert.deepEqual(model.agents[0].credits, { kind: 'text', text: 'available' });
+  assert.deepEqual(model.agents[0].credits, {
+    kind: 'text',
+    text: 'available',
+  });
 });
 
 test('credits with used/limit/currency/decimals render as a gauge credits entry', () => {
@@ -164,7 +196,13 @@ test('credits with used/limit/currency/decimals render as a gauge credits entry'
       snapshot({
         usage: {
           fiveHour: { usedPercent: 10 },
-          credits: { used: 1240, limit: 5000, currency: 'USD', decimals: 2, usedPercent: 24.8 },
+          credits: {
+            used: 1240,
+            limit: 5000,
+            currency: 'USD',
+            decimals: 2,
+            usedPercent: 24.8,
+          },
         },
       }),
     ],
@@ -181,7 +219,11 @@ test('credits with used/limit/currency/decimals render as a gauge credits entry'
 
 test('credits missing required gauge fields and no text render as no credits', () => {
   const model = buildPanelModel(
-    [snapshot({ usage: { fiveHour: { usedPercent: 10 }, credits: { used: 100 } } })],
+    [
+      snapshot({
+        usage: { fiveHour: { usedPercent: 10 }, credits: { used: 100 } },
+      }),
+    ],
     settings(),
   );
   assert.equal(model.agents[0].credits, undefined);
@@ -222,7 +264,12 @@ test('footer is a "note" kind carrying the note text when a note is present', ()
 
 test('the provider icon id is carried onto the entry for an ok agent', () => {
   const model = buildPanelModel(
-    [snapshot({ icon: 'ai-status-bar-claude', usage: { fiveHour: { usedPercent: 10 } } })],
+    [
+      snapshot({
+        icon: 'ai-status-bar-claude',
+        usage: { fiveHour: { usedPercent: 10 } },
+      }),
+    ],
     settings(),
   );
   assert.equal(model.agents[0].icon, 'ai-status-bar-claude');
@@ -238,8 +285,14 @@ test('the provider icon id is carried onto the entry even for a disabled agent',
 
 test('agent order in the model matches the order of the input snapshots', () => {
   const model = buildPanelModel(
-    [snapshot({ providerId: 'codex', label: 'Codex' }), snapshot({ providerId: 'claude', label: 'Claude' })],
+    [
+      snapshot({ providerId: 'codex', label: 'Codex' }),
+      snapshot({ providerId: 'claude', label: 'Claude' }),
+    ],
     settings(),
   );
-  assert.deepEqual(model.agents.map((a) => a.providerId), ['codex', 'claude']);
+  assert.deepEqual(
+    model.agents.map((a) => a.providerId),
+    ['codex', 'claude'],
+  );
 });

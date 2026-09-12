@@ -44,14 +44,19 @@ test('style-src allows inline styles without a nonce, so per-row width styles ar
 });
 
 test('a disabled agent renders its message and no window rows', () => {
-  const html = renderPanelHtml(model([entry({ state: 'disabled', message: 'Disabled' })]), opts);
+  const html = renderPanelHtml(
+    model([entry({ state: 'disabled', message: 'Disabled' })]),
+    opts,
+  );
   assert.match(html, /Disabled/);
   assert.doesNotMatch(html, /class="track"/);
 });
 
 test('an unavailable agent renders its reason as the message', () => {
   const html = renderPanelHtml(
-    model([entry({ state: 'unavailable', message: 'no Claude credentials found' })]),
+    model([
+      entry({ state: 'unavailable', message: 'no Claude credentials found' }),
+    ]),
     opts,
   );
   assert.match(html, /no Claude credentials found/);
@@ -62,7 +67,13 @@ test('window rows render label, percent text, and reset text', () => {
     model([
       entry({
         windows: [
-          { label: '5-hour', pctText: '42%', displayPercent: 42, severityLevel: 'ok', resetText: '14:30' },
+          {
+            label: '5-hour',
+            pctText: '42%',
+            displayPercent: 42,
+            severityLevel: 'ok',
+            resetText: '14:30',
+          },
         ],
       }),
     ]),
@@ -77,7 +88,15 @@ test('bar width clamps to 100% when displayPercent exceeds 100', () => {
   const html = renderPanelHtml(
     model([
       entry({
-        windows: [{ label: '5-hour', pctText: '120%', displayPercent: 120, severityLevel: 'warn', resetText: '' }],
+        windows: [
+          {
+            label: '5-hour',
+            pctText: '120%',
+            displayPercent: 120,
+            severityLevel: 'warn',
+            resetText: '',
+          },
+        ],
       }),
     ]),
     opts,
@@ -89,7 +108,15 @@ test('bar width clamps to 0% when displayPercent is negative', () => {
   const html = renderPanelHtml(
     model([
       entry({
-        windows: [{ label: '5-hour', pctText: '0%', displayPercent: -20, severityLevel: 'ok', resetText: '' }],
+        windows: [
+          {
+            label: '5-hour',
+            pctText: '0%',
+            displayPercent: -20,
+            severityLevel: 'ok',
+            resetText: '',
+          },
+        ],
       }),
     ]),
     opts,
@@ -101,7 +128,15 @@ test('bar width is 0% when displayPercent is undefined', () => {
   const html = renderPanelHtml(
     model([
       entry({
-        windows: [{ label: '5-hour', pctText: '-', displayPercent: undefined, severityLevel: 'none', resetText: '' }],
+        windows: [
+          {
+            label: '5-hour',
+            pctText: '-',
+            displayPercent: undefined,
+            severityLevel: 'none',
+            resetText: '',
+          },
+        ],
       }),
     ]),
     opts,
@@ -132,7 +167,13 @@ test('credits gauge renders the percent and amount text', () => {
   const html = renderPanelHtml(
     model([
       entry({
-        credits: { kind: 'gauge', pctText: '25%', displayPercent: 25, severityLevel: 'ok', amountText: '$12.40 / $50.00' },
+        credits: {
+          kind: 'gauge',
+          pctText: '25%',
+          displayPercent: 25,
+          severityLevel: 'ok',
+          amountText: '$12.40 / $50.00',
+        },
       }),
     ]),
     opts,
@@ -143,18 +184,27 @@ test('credits gauge renders the percent and amount text', () => {
 
 test('a rate-limit banner appears only when limitReached is true', () => {
   const reached = renderPanelHtml(model([entry({ limitReached: true })]), opts);
-  const notReached = renderPanelHtml(model([entry({ limitReached: false })]), opts);
+  const notReached = renderPanelHtml(
+    model([entry({ limitReached: false })]),
+    opts,
+  );
   assert.match(reached, /Rate limit reached/);
   assert.doesNotMatch(notReached, /Rate limit reached/);
 });
 
 test('an ok agent with a pending message and no usage shows the message, not a stale footer', () => {
-  const html = renderPanelHtml(model([entry({ message: 'Fetching Claude usage...' })]), opts);
+  const html = renderPanelHtml(
+    model([entry({ message: 'Fetching Claude usage...' })]),
+    opts,
+  );
   assert.match(html, /Fetching Claude usage\.\.\./);
 });
 
 test('the updated footer renders the time text', () => {
-  const html = renderPanelHtml(model([entry({ footer: { kind: 'updated', timeText: '14:02' } })]), opts);
+  const html = renderPanelHtml(
+    model([entry({ footer: { kind: 'updated', timeText: '14:02' } })]),
+    opts,
+  );
   assert.match(html, /14:02/);
 });
 
@@ -165,12 +215,18 @@ test('rendering with no agents produces valid html without throwing', () => {
 test('a separator rule applies to every agent block except the last, automatically', () => {
   // Not per-instance markup: a single :not(:last-child) rule in the stylesheet,
   // so it applies correctly whether 1, 2, or N agents are rendered.
-  const html = renderPanelHtml(model([entry(), entry({ providerId: 'codex' })]), opts);
+  const html = renderPanelHtml(
+    model([entry(), entry({ providerId: 'codex' })]),
+    opts,
+  );
   assert.match(html, /\.agent:not\(:last-child\)/);
 });
 
 test('a known agent icon id renders a brand icon before the agent name', () => {
-  const html = renderPanelHtml(model([entry({ icon: 'ai-status-bar-claude' })]), opts);
+  const html = renderPanelHtml(
+    model([entry({ icon: 'ai-status-bar-claude' })]),
+    opts,
+  );
   const header = /<header>.*?<\/header>/s.exec(html)?.[0] ?? '';
   assert.match(header, /class="brand-icon"/);
   assert.match(header, /<svg/);
@@ -181,12 +237,18 @@ test('a known agent icon id renders a brand icon before the agent name', () => {
 });
 
 test('an unrecognized icon id renders no brand icon markup', () => {
-  const html = renderPanelHtml(model([entry({ icon: 'something-unknown' })]), opts);
+  const html = renderPanelHtml(
+    model([entry({ icon: 'something-unknown' })]),
+    opts,
+  );
   const header = /<header>.*?<\/header>/s.exec(html)?.[0] ?? '';
   assert.doesNotMatch(header, /class="brand-icon"/);
 });
 
 test('text-form credits render a colon between the label and the value', () => {
-  const html = renderPanelHtml(model([entry({ credits: { kind: 'text', text: 'available' } })]), opts);
+  const html = renderPanelHtml(
+    model([entry({ credits: { kind: 'text', text: 'available' } })]),
+    opts,
+  );
   assert.match(html, /Credits:\s*<\/span>\s*<span class="value">available/);
 });

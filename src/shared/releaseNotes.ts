@@ -30,7 +30,10 @@ function isHeadingFor(line: string, version: string): boolean {
   return rest.startsWith(version) && /\s/.test(rest.charAt(version.length));
 }
 
-export function extractReleaseNotes(changelog: string, version: string): string {
+export function extractReleaseNotes(
+  changelog: string,
+  version: string,
+): string {
   const lines = changelog.split('\n');
   let offset = 0;
   let sectionStart = -1;

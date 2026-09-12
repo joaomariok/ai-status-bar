@@ -3,7 +3,12 @@ import * as vscode from 'vscode';
 import { readCache, writeCache } from './cache';
 import { renderStatus } from './renderer';
 import { getSettings } from './settings';
-import { AgentProvider, AgentSnapshot, AgentSnapshotState, AgentUsage } from './types';
+import {
+  AgentProvider,
+  AgentSnapshot,
+  AgentSnapshotState,
+  AgentUsage,
+} from './types';
 import { UsageStore } from './usageStore';
 
 const MAX_BACKOFF_MS = 30 * 60_000;
@@ -32,8 +37,14 @@ export class AgentStatusController implements vscode.Disposable {
     priority: number,
     private readonly store: UsageStore,
   ) {
-    this.item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, priority);
-    this.cacheFile = path.join(context.globalStorageUri.fsPath, `${provider.id}-usage-cache.json`);
+    this.item = vscode.window.createStatusBarItem(
+      vscode.StatusBarAlignment.Right,
+      priority,
+    );
+    this.cacheFile = path.join(
+      context.globalStorageUri.fsPath,
+      `${provider.id}-usage-cache.json`,
+    );
     context.subscriptions.push(this.item);
     this.publish();
   }
@@ -170,8 +181,15 @@ export class AgentStatusController implements vscode.Disposable {
       const labels = this.usage?.windowLabels ?? this.provider.windowLabels;
       const fiveLabel = labels?.fiveHourTooltip ?? '5-hour';
       const weekLabel = labels?.weeklyTooltip ?? 'weekly';
-      const which = five >= warnAt && week >= warnAt ? `${fiveLabel} and ${weekLabel}` : five >= warnAt ? fiveLabel : weekLabel;
-      void vscode.window.showWarningMessage(`${this.provider.label} ${which} usage at ${Math.round(worst)}%.`);
+      const which =
+        five >= warnAt && week >= warnAt
+          ? `${fiveLabel} and ${weekLabel}`
+          : five >= warnAt
+            ? fiveLabel
+            : weekLabel;
+      void vscode.window.showWarningMessage(
+        `${this.provider.label} ${which} usage at ${Math.round(worst)}%.`,
+      );
     } else if (worst < warnAt) {
       this.alerted = false;
     }
@@ -181,13 +199,16 @@ export class AgentStatusController implements vscode.Disposable {
 function retryAfterFrom(error: unknown): number | undefined {
   if (error === null || typeof error !== 'object') return undefined;
   const value = (error as { retryAfterMs?: unknown }).retryAfterMs;
-  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+  return typeof value === 'number' && Number.isFinite(value)
+    ? value
+    : undefined;
 }
 
 function noteFromError(error: unknown): string {
   const status = statusFrom(error);
   if (status === 429) return 'rate limited (HTTP 429)';
-  if (status === 401 || status === 403) return 'token rejected (reopen the agent)';
+  if (status === 401 || status === 403)
+    return 'token rejected (reopen the agent)';
 
   const message = error instanceof Error ? error.message : String(error);
   return `fetch failed (${message})`;
@@ -196,7 +217,8 @@ function noteFromError(error: unknown): string {
 function statusFrom(error: unknown): number | undefined {
   if (error === null || typeof error !== 'object') return undefined;
 
-  const status = (error as { status?: unknown; statusCode?: unknown }).status ??
+  const status =
+    (error as { status?: unknown; statusCode?: unknown }).status ??
     (error as { status?: unknown; statusCode?: unknown }).statusCode;
   if (typeof status === 'number' && Number.isFinite(status)) return status;
 

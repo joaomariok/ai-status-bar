@@ -12,7 +12,10 @@ export interface PanelHtmlOptions {
  * webview host (usageViewProvider.ts) is the only place that touches the
  * vscode API, so this stays independently unit-testable.
  */
-export function renderPanelHtml(model: PanelModel, opts: PanelHtmlOptions): string {
+export function renderPanelHtml(
+  model: PanelModel,
+  opts: PanelHtmlOptions,
+): string {
   const { cspSource, icons } = opts;
   // style-src is 'unsafe-inline' rather than nonce-scoped: nonces only ever
   // cover <style>/<link> elements, never a per-element `style="..."`
@@ -41,10 +44,15 @@ ${model.agents.map((entry) => renderAgent(entry, icons)).join('\n')}
 </html>`;
 }
 
-function renderAgent(entry: AgentPanelEntry, icons: Record<string, string>): string {
+function renderAgent(
+  entry: AgentPanelEntry,
+  icons: Record<string, string>,
+): string {
   const icon = icons[entry.icon];
   const iconMarkup = icon ? `<span class="brand-icon">${icon}</span>` : '';
-  const plan = entry.plan ? `<span class="plan">${escapeHtml(entry.plan)}</span>` : '';
+  const plan = entry.plan
+    ? `<span class="plan">${escapeHtml(entry.plan)}</span>`
+    : '';
 
   return `<section class="agent">
   <header>${iconMarkup}<span class="name">${escapeHtml(entry.label)}</span>${plan}</header>
@@ -84,7 +92,9 @@ function renderWindowRow(row: AgentPanelEntry['windows'][number]): string {
   </div>`;
 }
 
-function renderCredits(credits: NonNullable<AgentPanelEntry['credits']>): string {
+function renderCredits(
+  credits: NonNullable<AgentPanelEntry['credits']>,
+): string {
   if (credits.kind === 'text') {
     return `<div class="credits"><span class="label">Credits:</span> <span class="value">${escapeHtml(credits.text)}</span></div>`;
   }

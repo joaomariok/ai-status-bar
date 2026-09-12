@@ -12,7 +12,9 @@ interface Sample {
 let dir: string;
 
 before(async () => {
-  dir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'ai-status-bar-cache-test-'));
+  dir = await fs.promises.mkdtemp(
+    path.join(os.tmpdir(), 'ai-status-bar-cache-test-'),
+  );
 });
 
 after(async () => {
@@ -21,7 +23,10 @@ after(async () => {
 
 afterEach(async () => {
   for (const entry of await fs.promises.readdir(dir)) {
-    await fs.promises.rm(path.join(dir, entry), { recursive: true, force: true });
+    await fs.promises.rm(path.join(dir, entry), {
+      recursive: true,
+      force: true,
+    });
   }
 });
 
@@ -75,5 +80,7 @@ test('writeCache does not throw when the target path is unwritable', async () =>
   await fs.promises.writeFile(blocker, 'not a directory');
   const file = path.join(blocker, 'cache.json');
 
-  await assert.doesNotReject(writeCache<Sample>(file, { stamp: 1, value: { greeting: 'x' } }));
+  await assert.doesNotReject(
+    writeCache<Sample>(file, { stamp: 1, value: { greeting: 'x' } }),
+  );
 });

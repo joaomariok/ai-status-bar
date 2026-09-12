@@ -17,8 +17,13 @@ export function getExtensionVersion(): string {
   if (cached !== undefined) return cached;
   try {
     const manifestPath = path.join(__dirname, '..', '..', 'package.json');
-    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8')) as { version?: unknown };
-    cached = typeof manifest.version === 'string' ? manifest.version : FALLBACK_VERSION;
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8')) as {
+      version?: unknown;
+    };
+    cached =
+      typeof manifest.version === 'string'
+        ? manifest.version
+        : FALLBACK_VERSION;
   } catch {
     cached = FALLBACK_VERSION;
   }

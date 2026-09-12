@@ -54,7 +54,12 @@ export class UsageViewProvider implements vscode.WebviewViewProvider {
       ICON_IDS.map(async (id): Promise<[string, string]> => {
         const file = `${id.replace(/^ai-status-bar-/, '')}.svg`;
         try {
-          const uri = vscode.Uri.joinPath(this.extensionUri, 'assets', 'icons', file);
+          const uri = vscode.Uri.joinPath(
+            this.extensionUri,
+            'assets',
+            'icons',
+            file,
+          );
           const bytes = await vscode.workspace.fs.readFile(uri);
           return [id, Buffer.from(bytes).toString('utf8')];
         } catch {

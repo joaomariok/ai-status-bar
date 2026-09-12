@@ -26,7 +26,10 @@ test('extractReleaseNotes returns the last section through EOF', () => {
 });
 
 test('extractReleaseNotes throws for an unknown version', () => {
-  assert.throws(() => extractReleaseNotes(CHANGELOG, '9.9.9'), /No CHANGELOG\.md section found for version 9\.9\.9/);
+  assert.throws(
+    () => extractReleaseNotes(CHANGELOG, '9.9.9'),
+    /No CHANGELOG\.md section found for version 9\.9\.9/,
+  );
 });
 
 test('extractReleaseNotes matches a version containing regex metacharacters', () => {
@@ -40,7 +43,10 @@ test('extractReleaseNotes does not treat a version with metacharacters as a patt
     () => extractReleaseNotes(CHANGELOG, '1.1.0.*'),
     /No CHANGELOG\.md section found for version 1\.1\.0\.\*/,
   );
-  assert.throws(() => extractReleaseNotes(CHANGELOG, '.*'), /No CHANGELOG\.md section found for version \.\*/);
+  assert.throws(
+    () => extractReleaseNotes(CHANGELOG, '.*'),
+    /No CHANGELOG\.md section found for version \.\*/,
+  );
 });
 
 test('extractReleaseNotes distinguishes a version from a longer near-miss heading', () => {

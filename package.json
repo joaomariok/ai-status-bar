@@ -219,17 +219,25 @@
     "bump:patch:compile": "npm version patch --no-git-tag-version && npm run compile",
     "clean": "node scripts/clean.mjs",
     "compile": "tsc -p ./",
+    "format": "prettier --write \"src/**/*.ts\" \"scripts/**/*.mjs\" \".vscode/**/*.json\" \".github/**/*.{yml,yaml}\" package.json taskdev.json tsconfig.json eslint.config.mjs prettier.config.mjs",
+    "format:check": "prettier --check \"src/**/*.ts\" \"scripts/**/*.mjs\" \".vscode/**/*.json\" \".github/**/*.{yml,yaml}\" package.json taskdev.json tsconfig.json eslint.config.mjs prettier.config.mjs",
     "gate": "node scripts/gate.mjs",
     "install:local": "node scripts/install-local.mjs",
+    "lint": "eslint src",
     "pack": "npm run compile && vsce package",
     "test": "npm run compile && node --test out/test/*.test.js",
     "typecheck": "tsc --noEmit -p ./",
     "watch": "tsc -watch -p ./"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^20.0.0",
     "@types/vscode": "1.85.0",
     "@vscode/vsce": "^3.9.2",
-    "typescript": "^5.4.0"
+    "eslint": "^10.10.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.9.6",
+    "typescript": "^5.4.0",
+    "typescript-eslint": "^8.70.0"
   }
 }

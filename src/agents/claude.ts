@@ -43,31 +43,39 @@ export class ClaudeProvider implements AgentProvider {
 
   async fetchUsage(): Promise<AgentUsage> {
     const credentials = await readClaudeCredentials();
-    if (!credentials?.accessToken) throw new Error('no credentials; sign in to Claude Code');
+    if (!credentials?.accessToken)
+      throw new Error('no credentials; sign in to Claude Code');
 
     const payload = await fetchClaudeUsage(credentials.accessToken);
     return {
       plan: credentials.plan,
-      fiveHour: payload.five_hour?.utilization === undefined
-        ? undefined
-        : {
-          usedPercent: payload.five_hour.utilization,
-          resetsAt: payload.five_hour.resets_at,
-        },
-      weekly: payload.seven_day?.utilization === undefined
-        ? undefined
-        : {
-          usedPercent: payload.seven_day.utilization,
-          resetsAt: payload.seven_day.resets_at,
-        },
+      fiveHour:
+        payload.five_hour?.utilization === undefined
+          ? undefined
+          : {
+              usedPercent: payload.five_hour.utilization,
+              resetsAt: payload.five_hour.resets_at,
+            },
+      weekly:
+        payload.seven_day?.utilization === undefined
+          ? undefined
+          : {
+              usedPercent: payload.seven_day.utilization,
+              resetsAt: payload.seven_day.resets_at,
+            },
       credits: toCredits(payload),
     };
   }
 }
 
-async function readClaudeCredentials(): Promise<ReturnType<typeof parseClaudeCredentials>> {
+async function readClaudeCredentials(): Promise<
+  ReturnType<typeof parseClaudeCredentials>
+> {
   try {
-    const raw = await fs.promises.readFile(path.join(os.homedir(), '.claude', '.credentials.json'), 'utf8');
+    const raw = await fs.promises.readFile(
+      path.join(os.homedir(), '.claude', '.credentials.json'),
+      'utf8',
+    );
     return parseClaudeCredentials(raw);
   } catch {
     return undefined;
@@ -88,14 +96,22 @@ function fetchClaudeUsage(token: string): Promise<ClaudeUsagePayload> {
       },
       (res) => {
         let body = '';
-        res.on('data', (chunk) => { body += chunk; });
+        res.on('data', (chunk) => {
+          body += chunk;
+        });
         res.on('end', () => {
           if (res.statusCode !== 200) {
-            const error = new Error(`HTTP ${res.statusCode}`) as Error & { retryAfterMs?: number; status?: number };
+            const error = new Error(`HTTP ${res.statusCode}`) as Error & {
+              retryAfterMs?: number;
+              status?: number;
+            };
             error.status = res.statusCode;
             const retryAfter = Number(res.headers['retry-after']);
             if (Number.isFinite(retryAfter) && retryAfter >= 0) {
-              error.retryAfterMs = Math.min(MAX_RETRY_AFTER_MS, Math.max(5_000, retryAfter * 1000));
+              error.retryAfterMs = Math.min(
+                MAX_RETRY_AFTER_MS,
+                Math.max(5_000, retryAfter * 1000),
+              );
             }
             reject(error);
             return;

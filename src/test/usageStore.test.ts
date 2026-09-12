@@ -3,7 +3,10 @@ import { test } from 'node:test';
 import { UsageStore } from '../shared/usageStore';
 import { AgentSnapshot } from '../shared/types';
 
-function snapshot(providerId: string, overrides: Partial<AgentSnapshot> = {}): AgentSnapshot {
+function snapshot(
+  providerId: string,
+  overrides: Partial<AgentSnapshot> = {},
+): AgentSnapshot {
   return {
     providerId,
     label: providerId,
@@ -78,8 +81,12 @@ test('multiple listeners are all notified independently', () => {
   const store = new UsageStore();
   let a = 0;
   let b = 0;
-  store.onChange(() => { a += 1; });
-  store.onChange(() => { b += 1; });
+  store.onChange(() => {
+    a += 1;
+  });
+  store.onChange(() => {
+    b += 1;
+  });
 
   store.set(snapshot('codex'));
 

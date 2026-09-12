@@ -102,70 +102,136 @@ test('money falls back to the currency code with a trailing space when unknown',
 
 test('statusPart renders a gauge and percentage in full style', () => {
   assert.equal(
-    statusPart('5h', 34, { style: 'full', mode: 'used', cells: 3, cautionAt: 70, warnAt: 90 }),
+    statusPart('5h', 34, {
+      style: 'full',
+      mode: 'used',
+      cells: 3,
+      cautionAt: 70,
+      warnAt: 90,
+    }),
     '🟢 5h ▰▱▱ 34%',
   );
 });
 
 test('statusPart renders label and percentage without a gauge in compact style', () => {
   assert.equal(
-    statusPart('5h', 34, { style: 'compact', mode: 'used', cells: 3, cautionAt: 70, warnAt: 90 }),
+    statusPart('5h', 34, {
+      style: 'compact',
+      mode: 'used',
+      cells: 3,
+      cautionAt: 70,
+      warnAt: 90,
+    }),
     '🟢 5h: 34%',
   );
 });
 
 test('statusPart compact style ignores the cells count', () => {
-  const withFewCells = statusPart('5h', 34, { style: 'compact', mode: 'used', cells: 3, cautionAt: 70, warnAt: 90 });
-  const withManyCells = statusPart('5h', 34, { style: 'compact', mode: 'used', cells: 10, cautionAt: 70, warnAt: 90 });
+  const withFewCells = statusPart('5h', 34, {
+    style: 'compact',
+    mode: 'used',
+    cells: 3,
+    cautionAt: 70,
+    warnAt: 90,
+  });
+  const withManyCells = statusPart('5h', 34, {
+    style: 'compact',
+    mode: 'used',
+    cells: 10,
+    cautionAt: 70,
+    warnAt: 90,
+  });
   assert.equal(withFewCells, withManyCells);
 });
 
 test('statusPart handles an undefined used percent in both styles', () => {
   assert.equal(
-    statusPart('5h', undefined, { style: 'full', mode: 'used', cells: 3, cautionAt: 70, warnAt: 90 }),
+    statusPart('5h', undefined, {
+      style: 'full',
+      mode: 'used',
+      cells: 3,
+      cautionAt: 70,
+      warnAt: 90,
+    }),
     '○ 5h ▱▱▱ -',
   );
   assert.equal(
-    statusPart('5h', undefined, { style: 'compact', mode: 'used', cells: 3, cautionAt: 70, warnAt: 90 }),
+    statusPart('5h', undefined, {
+      style: 'compact',
+      mode: 'used',
+      cells: 3,
+      cautionAt: 70,
+      warnAt: 90,
+    }),
     '○ 5h: -',
   );
 });
 
 test('statusPart inverts the percentage in remaining mode for both styles', () => {
   assert.equal(
-    statusPart('5h', 34, { style: 'full', mode: 'remaining', cells: 3, cautionAt: 70, warnAt: 90 }),
+    statusPart('5h', 34, {
+      style: 'full',
+      mode: 'remaining',
+      cells: 3,
+      cautionAt: 70,
+      warnAt: 90,
+    }),
     '🟢 5h ▰▰▱ 66%',
   );
   assert.equal(
-    statusPart('5h', 34, { style: 'compact', mode: 'remaining', cells: 3, cautionAt: 70, warnAt: 90 }),
+    statusPart('5h', 34, {
+      style: 'compact',
+      mode: 'remaining',
+      cells: 3,
+      cautionAt: 70,
+      warnAt: 90,
+    }),
     '🟢 5h: 66%',
   );
 });
 
 test('statusPart applies warn threshold dot in compact style', () => {
   assert.equal(
-    statusPart('5h', 95, { style: 'compact', mode: 'used', cells: 3, cautionAt: 70, warnAt: 90 }),
+    statusPart('5h', 95, {
+      style: 'compact',
+      mode: 'used',
+      cells: 3,
+      cautionAt: 70,
+      warnAt: 90,
+    }),
     '🔴 5h: 95%',
   );
 });
 
 test('agentPrefix renders the name alone in text style', () => {
-  assert.equal(agentPrefix('Claude', 'ai-status-bar-claude', 'text'), 'Claude: ');
+  assert.equal(
+    agentPrefix('Claude', 'ai-status-bar-claude', 'text'),
+    'Claude: ',
+  );
 });
 
 test('agentPrefix renders the icon alone in icon style, dot-separated like the usage windows', () => {
-  assert.equal(agentPrefix('Claude', 'ai-status-bar-claude', 'icon'), '$(ai-status-bar-claude) · ');
+  assert.equal(
+    agentPrefix('Claude', 'ai-status-bar-claude', 'icon'),
+    '$(ai-status-bar-claude) · ',
+  );
 });
 
 test('agentPrefix renders the icon and the name in both style', () => {
-  assert.equal(agentPrefix('Claude', 'ai-status-bar-claude', 'both'), '$(ai-status-bar-claude) Claude: ');
+  assert.equal(
+    agentPrefix('Claude', 'ai-status-bar-claude', 'both'),
+    '$(ai-status-bar-claude) Claude: ',
+  );
 });
 
 test('escapeMarkdown escapes markdown-significant characters', () => {
   assert.equal(escapeMarkdown(undefined), '');
   assert.equal(escapeMarkdown(''), '');
   assert.equal(escapeMarkdown('plain text'), 'plain text');
-  assert.equal(escapeMarkdown('*bold* and _italic_'), '\\*bold\\* and \\_italic\\_');
+  assert.equal(
+    escapeMarkdown('*bold* and _italic_'),
+    '\\*bold\\* and \\_italic\\_',
+  );
   assert.equal(escapeMarkdown('[link](url)'), '\\[link\\]\\(url\\)');
 });
 
@@ -192,6 +258,9 @@ test('escapeHtml escapes HTML-significant characters', () => {
   assert.equal(escapeHtml(undefined), '');
   assert.equal(escapeHtml(''), '');
   assert.equal(escapeHtml('plain text'), 'plain text');
-  assert.equal(escapeHtml('<script>alert("x")</script>'), '&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;');
+  assert.equal(
+    escapeHtml('<script>alert("x")</script>'),
+    '&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;',
+  );
   assert.equal(escapeHtml("a & b's <tag>"), 'a &amp; b&#39;s &lt;tag&gt;');
 });

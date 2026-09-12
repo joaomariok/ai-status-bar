@@ -15,11 +15,14 @@ export function getSettings(): AgentSettings {
     pollMs: Math.max(30, cfg.get<number>('pollSeconds') ?? 120) * 1000,
     cells: cfg.get<number>('barCells') ?? 3,
     showWeekly: cfg.get<boolean>('showWeekly') ?? true,
-    replacePrimaryWithWeeklyOnLimit: cfg.get<boolean>('replacePrimaryWithWeeklyOnLimit') ?? true,
+    replacePrimaryWithWeeklyOnLimit:
+      cfg.get<boolean>('replacePrimaryWithWeeklyOnLimit') ?? true,
     cautionAt: cfg.get<number>('cautionAt') ?? CAUTION_AT,
     warnAt: cfg.get<number>('warnAt') ?? WARN_AT,
     locale: cfg.get<string>('locale') || undefined,
-    presentationMode: cfg.get<'agentDefault' | 'used' | 'remaining'>('presentationMode') ?? 'agentDefault',
+    presentationMode:
+      cfg.get<'agentDefault' | 'used' | 'remaining'>('presentationMode') ??
+      'agentDefault',
     statusBarStyle: cfg.get<StatusBarStyle>('statusBarStyle') ?? 'full',
     agentNameStyle: cfg.get<AgentNameStyle>('agentNameStyle') ?? 'both',
   };

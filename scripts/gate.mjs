@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Local pre-submit validation, and the same steps the release workflow
-// (.github/workflows/release.yml) runs before packaging. Runs typecheck ->
-// tests -> a packaging dry-run, stopping at the first failure.
+// (.github/workflows/release.yml) runs before packaging. Runs lint -> format
+// check -> typecheck -> tests -> a packaging dry-run, stopping at the first
+// failure.
 import { spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,6 +16,8 @@ const npmCmd = 'npm';
 const npxCmd = 'npx';
 
 const steps = [
+  { name: 'lint', command: npmCmd, args: ['run', 'lint'] },
+  { name: 'format check', command: npmCmd, args: ['run', 'format:check'] },
   { name: 'typecheck', command: npmCmd, args: ['run', 'typecheck'] },
   { name: 'test', command: npmCmd, args: ['test'] },
   { name: 'package dry-run', command: npxCmd, args: ['vsce', 'ls'] },
@@ -28,7 +31,11 @@ for (const step of steps) {
   // array) avoids Node's shell-argument-escaping deprecation warning; safe
   // here since every argument is a fixed literal, never user input.
   const result = useShell
-    ? spawnSync([step.command, ...step.args].join(' '), { cwd: repoRoot, stdio: 'inherit', shell: true })
+    ? spawnSync([step.command, ...step.args].join(' '), {
+        cwd: repoRoot,
+        stdio: 'inherit',
+        shell: true,
+      })
     : spawnSync(step.command, step.args, { cwd: repoRoot, stdio: 'inherit' });
 
   if (result.error || result.status !== 0) {

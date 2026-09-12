@@ -36,6 +36,14 @@ interface RateLimitsResponse {
   rateLimitsByLimitId: Record<string, RateLimitSnapshot | undefined> | null;
 }
 
+interface AppServerResponse {
+  id?: number;
+  error?: {
+    message?: string;
+  };
+  result?: unknown;
+}
+
 export class CodexProvider implements AgentProvider {
   readonly id = 'codex';
   readonly label = 'Codex';
@@ -58,33 +66,34 @@ export class CodexProvider implements AgentProvider {
   async detect(): Promise<AgentDetection> {
     const configured = getString('codex.command', 'codex');
     const resolved = await resolveCodexCommand(configured);
-    if (resolved !== 'codex' || configured !== 'codex') return { available: true };
+    if (resolved !== 'codex' || configured !== 'codex')
+      return { available: true };
 
     // The executable may still be on PATH. Let fetchUsage make the final call.
     return { available: true };
   }
 
   async fetchUsage(): Promise<AgentUsage> {
-    const command = await resolveCodexCommand(getString('codex.command', 'codex'));
+    const command = await resolveCodexCommand(
+      getString('codex.command', 'codex'),
+    );
     const usage = await fetchCodexRateLimits(command, this.activeProcesses);
 
     return {
       plan: usage.planType ?? undefined,
       fiveHour: usage.primary
         ? {
-          usedPercent: usage.primary.usedPercent,
-          resetsAt: usage.primary.resetsAt,
-        }
+            usedPercent: usage.primary.usedPercent,
+            resetsAt: usage.primary.resetsAt,
+          }
         : undefined,
       weekly: usage.secondary
         ? {
-          usedPercent: usage.secondary.usedPercent,
-          resetsAt: usage.secondary.resetsAt,
-        }
+            usedPercent: usage.secondary.usedPercent,
+            resetsAt: usage.secondary.resetsAt,
+          }
         : undefined,
-      credits: usage.credits
-        ? { text: creditText(usage.credits) }
-        : undefined,
+      credits: usage.credits ? { text: creditText(usage.credits) } : undefined,
       limitReached: Boolean(usage.rateLimitReachedType),
     };
   }
@@ -104,7 +113,10 @@ async function exists(file: string): Promise<boolean> {
   }
 }
 
-async function findFirstMatchingCodex(root: string | undefined, relativeParts: string[]): Promise<string | undefined> {
+async function findFirstMatchingCodex(
+  root: string | undefined,
+  relativeParts: string[],
+): Promise<string | undefined> {
   if (!root) return undefined;
   try {
     const entries = await fs.promises.readdir(root, { withFileTypes: true });
@@ -140,19 +152,36 @@ async function resolveCodexCommand(configured: string): Promise<string> {
 async function codexCommandCandidates(): Promise<string[]> {
   const candidates: Array<string | undefined> = [
     ...npmCodexCandidates(),
-    ...await extensionCodexCandidates(),
+    ...(await extensionCodexCandidates()),
   ];
 
-  return candidates.filter((candidate): candidate is string => Boolean(candidate));
+  return candidates.filter((candidate): candidate is string =>
+    Boolean(candidate),
+  );
 }
 
 function npmCodexCandidates(): Array<string | undefined> {
   if (process.platform === 'win32') {
     return [
       process.env.APPDATA
-        ? path.join(process.env.APPDATA, 'npm', 'node_modules', '@openai', 'codex', 'node_modules', '@openai', 'codex-win32-x64', 'vendor', 'x86_64-pc-windows-msvc', 'codex', 'codex.exe')
+        ? path.join(
+            process.env.APPDATA,
+            'npm',
+            'node_modules',
+            '@openai',
+            'codex',
+            'node_modules',
+            '@openai',
+            'codex-win32-x64',
+            'vendor',
+            'x86_64-pc-windows-msvc',
+            'codex',
+            'codex.exe',
+          )
         : undefined,
-      process.env.APPDATA ? path.join(process.env.APPDATA, 'npm', 'codex.exe') : undefined,
+      process.env.APPDATA
+        ? path.join(process.env.APPDATA, 'npm', 'codex.exe')
+        : undefined,
     ];
   }
 
@@ -188,8 +217,22 @@ function extensionRoots(): string[] {
 
   if (process.platform === 'darwin') {
     roots.push(
-      path.join(home, 'Library', 'Application Support', 'Code', 'User', 'globalStorage'),
-      path.join(home, 'Library', 'Application Support', 'Cursor', 'User', 'globalStorage'),
+      path.join(
+        home,
+        'Library',
+        'Application Support',
+        'Code',
+        'User',
+        'globalStorage',
+      ),
+      path.join(
+        home,
+        'Library',
+        'Application Support',
+        'Cursor',
+        'User',
+        'globalStorage',
+      ),
     );
   }
 
@@ -203,13 +246,25 @@ function platformExtensionBinaryPaths(): string[][] {
 
   if (process.platform === 'darwin') {
     return [
-      ['bin', process.arch === 'arm64' ? 'macos-aarch64' : 'macos-x86_64', 'codex'],
-      ['bin', process.arch === 'arm64' ? 'darwin-aarch64' : 'darwin-x86_64', 'codex'],
+      [
+        'bin',
+        process.arch === 'arm64' ? 'macos-aarch64' : 'macos-x86_64',
+        'codex',
+      ],
+      [
+        'bin',
+        process.arch === 'arm64' ? 'darwin-aarch64' : 'darwin-x86_64',
+        'codex',
+      ],
     ];
   }
 
   return [
-    ['bin', process.arch === 'arm64' ? 'linux-aarch64' : 'linux-x86_64', 'codex'],
+    [
+      'bin',
+      process.arch === 'arm64' ? 'linux-aarch64' : 'linux-x86_64',
+      'codex',
+    ],
     ['bin', process.arch === 'arm64' ? 'linux-arm64' : 'linux-x64', 'codex'],
   ];
 }
@@ -224,7 +279,11 @@ function fetchCodexRateLimits(
 ): Promise<RateLimitSnapshot> {
   return new Promise((resolve, reject) => {
     if (isWindowsCommandShim(command)) {
-      reject(new Error('codex.command must point to codex.exe, not a .cmd/.bat shim'));
+      reject(
+        new Error(
+          'codex.command must point to codex.exe, not a .cmd/.bat shim',
+        ),
+      );
       return;
     }
 
@@ -235,10 +294,15 @@ function fetchCodexRateLimits(
     let stderr = '';
 
     const timer = setTimeout(() => {
-      finish(new Error(`account/rateLimits/read timed out${stderrSuffix(stderr)}`));
+      finish(
+        new Error(`account/rateLimits/read timed out${stderrSuffix(stderr)}`),
+      );
     }, START_TIMEOUT_MS + REQUEST_TIMEOUT_MS);
 
-    const finish = (error: Error | undefined, value?: RateLimitSnapshot): void => {
+    const finish = (
+      error: Error | undefined,
+      value?: RateLimitSnapshot,
+    ): void => {
       if (settled) return;
       settled = true;
       clearTimeout(timer);
@@ -261,7 +325,11 @@ function fetchCodexRateLimits(
     proc.stdin.once('error', finish);
     proc.once('exit', (code, signal) => {
       if (!settled) {
-        finish(new Error(`Codex app-server exited before responding (${signal ?? code ?? 'unknown'})${stderrSuffix(stderr)}`));
+        finish(
+          new Error(
+            `Codex app-server exited before responding (${signal ?? code ?? 'unknown'})${stderrSuffix(stderr)}`,
+          ),
+        );
       }
     });
     proc.stderr.on('data', (chunk: Buffer) => {
@@ -270,16 +338,18 @@ function fetchCodexRateLimits(
     });
 
     rl.on('line', (line) => {
-      let message: any;
+      let message: AppServerResponse;
       try {
-        message = JSON.parse(line);
+        message = JSON.parse(line) as AppServerResponse;
       } catch {
         return;
       }
 
       if (message.id === 0) {
         if (message.error) {
-          finish(new Error(message.error.message ?? JSON.stringify(message.error)));
+          finish(
+            new Error(message.error.message ?? JSON.stringify(message.error)),
+          );
           return;
         }
         send({ method: 'initialized', params: {} });
@@ -289,11 +359,16 @@ function fetchCodexRateLimits(
 
       if (message.id === 1) {
         if (message.error) {
-          finish(new Error(message.error.message ?? JSON.stringify(message.error)));
+          finish(
+            new Error(message.error.message ?? JSON.stringify(message.error)),
+          );
           return;
         }
         const response = message.result as RateLimitsResponse;
-        finish(undefined, response.rateLimitsByLimitId?.codex ?? response.rateLimits);
+        finish(
+          undefined,
+          response.rateLimitsByLimitId?.codex ?? response.rateLimits,
+        );
       }
     });
 
@@ -317,7 +392,11 @@ function fetchCodexRateLimits(
 function killTree(proc: ChildProcess): void {
   if (proc.killed || proc.pid === undefined) return;
   if (process.platform === 'win32') {
-    execFile('taskkill', ['/pid', String(proc.pid), '/T', '/F'], () => undefined);
+    execFile(
+      'taskkill',
+      ['/pid', String(proc.pid), '/T', '/F'],
+      () => undefined,
+    );
     return;
   }
   proc.kill();
