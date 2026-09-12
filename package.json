@@ -51,9 +51,38 @@
     "commands": [
       {
         "command": "aiStatusBar.refresh",
-        "title": "AI Status Bar: Refresh"
+        "title": "AI Status Bar: Refresh",
+        "icon": "$(refresh)"
       }
     ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "aiStatusBar",
+          "title": "AI Usage",
+          "icon": "assets/activity-bar.svg"
+        }
+      ]
+    },
+    "views": {
+      "aiStatusBar": [
+        {
+          "id": "aiStatusBar.usage",
+          "name": "Usage",
+          "type": "webview",
+          "icon": "assets/activity-bar.svg"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "aiStatusBar.refresh",
+          "when": "view == aiStatusBar.usage",
+          "group": "navigation"
+        }
+      ]
+    },
     "icons": {
       "ai-status-bar-claude": {
         "description": "Claude brand mark",

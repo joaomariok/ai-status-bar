@@ -3,6 +3,9 @@ out/
 tmp/
 versions/
 .vscode-test/
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
 *.vsix
 *.zip
 npm-debug.log*

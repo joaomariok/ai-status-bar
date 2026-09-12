@@ -42,12 +42,15 @@ npm test
 ```
 
 **Only modules with no `vscode` import are unit-testable this way**:
-[`src/shared/format.ts`](../src/shared/format.ts) and
-[`src/shared/cache.ts`](../src/shared/cache.ts). Everything else
-(`renderer.ts`, `settings.ts`, `statusController.ts`, all of `src/agents/`)
-imports `vscode`, which only resolves inside a real or mocked extension host.
-If you need to test logic in one of those files, factor the pure part out
-into `shared/` first rather than trying to run it under `node --test`.
+[`format.ts`](../src/shared/format.ts), [`cache.ts`](../src/shared/cache.ts),
+[`usageStore.ts`](../src/shared/usageStore.ts),
+[`panelModel.ts`](../src/shared/panelModel.ts), and
+[`panelHtml.ts`](../src/shared/panelHtml.ts). Everything else (`renderer.ts`,
+`settings.ts`, `statusController.ts`, `usageViewProvider.ts`, all of
+`src/agents/`) imports `vscode`, which only resolves inside a real or mocked
+extension host. If you need to test logic in one of those files, factor the
+pure part out into `shared/` first rather than trying to run it under
+`node --test`.
 
 ## The gate
 

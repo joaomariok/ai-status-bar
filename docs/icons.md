@@ -70,3 +70,34 @@ Both are in the Private Use Area, so they cannot collide with a real Unicode cha
   foreground color, so they follow the active theme automatically.
 - Keep `fontHeight: 512` and `normalize: true` (or equivalent) if regenerating, so both
   glyphs sit at a consistent visual weight relative to each other.
+
+## Panel brand icons
+
+The sidebar panel shows the same Claude and Codex marks next to each agent's name, read
+directly from `assets/icons/claude.svg` / `codex.svg` — the same files the WOFF font is
+built from (see "Sources" above), so there's exactly one place to update either mark.
+
+Unlike the WOFF glyphs, these ship as raw SVG files in the `.vsix` because [`usageViewProvider.ts`](../src/panel/usageViewProvider.ts) reads
+them via `vscode.workspace.fs.readFile` at first render and inlines the markup as text into
+the webview's HTML — not loaded through `<img src>`, which would isolate the SVG from the
+page's CSS. Inlining lets a plain stylesheet rule (`fill: currentColor` in
+[`panelHtml.ts`](../src/shared/panelHtml.ts)) theme them to the current foreground color,
+overriding whatever `fill` (or lack of one) the source file itself declares — the same
+effect the status-bar font glyphs get for free from being a font. `panelHtml.ts` itself
+never hardcodes icon markup; it only renders whatever `icons` map it's given, which is what
+keeps it `vscode`-free and unit-testable.
+
+Adding a new provider's brand mark: drop `assets/icons/<name>.svg`, and add its icon id to
+`ICON_IDS` in `usageViewProvider.ts` (the id must equal `provider.icon`, and the file name
+is that id with the `ai-status-bar-` prefix stripped).
+
+## Activity-bar icon
+
+`assets/activity-bar.svg` is **hand-authored for this project**, not sourced from a
+third-party pack like the two glyphs above. It's a simplified, monochrome echo of the
+marketplace icon's rows-of-bars motif (`assets/icon.png`): three solid rounded bars of
+varying width, no dots or segmented rectangles and no enclosing card — those details don't
+read at 24px and looked "dashed" rather than like bars. VS Code renders
+`viewsContainers.activitybar` icons as an alpha mask, so only the shape's silhouette
+matters — fill color in the file is ignored in favor of the current theme's activity-bar
+foreground.

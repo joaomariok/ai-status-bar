@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Added an "AI Usage" activity-bar panel that mirrors the status-bar tooltips with always-visible, proportional usage bars.
 - Removed Devin usage monitoring, its settings, and its API fallback.
 
 ## 1.0.0 - 2026-06-20

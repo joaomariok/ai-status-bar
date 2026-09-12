@@ -3,7 +3,8 @@ import * as vscode from 'vscode';
 import { readCache, writeCache } from './cache';
 import { renderStatus } from './renderer';
 import { getSettings } from './settings';
-import { AgentProvider, AgentUsage } from './types';
+import { AgentProvider, AgentSnapshot, AgentSnapshotState, AgentUsage } from './types';
+import { UsageStore } from './usageStore';
 
 const MAX_BACKOFF_MS = 30 * 60_000;
 
@@ -19,6 +20,7 @@ export class AgentStatusController implements vscode.Disposable {
   private usage: AgentUsage | undefined;
   private updatedAt: Date | undefined;
   private note: string | undefined;
+  private state: AgentSnapshotState = 'ok';
   private inFlight = false;
   private alerted = false;
   private disposed = false;
@@ -28,10 +30,12 @@ export class AgentStatusController implements vscode.Disposable {
     private readonly context: vscode.ExtensionContext,
     private readonly provider: AgentProvider,
     priority: number,
+    private readonly store: UsageStore,
   ) {
     this.item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, priority);
     this.cacheFile = path.join(context.globalStorageUri.fsPath, `${provider.id}-usage-cache.json`);
     context.subscriptions.push(this.item);
+    this.publish();
   }
 
   start(initialDelayMs = 0): void {
@@ -61,6 +65,8 @@ export class AgentStatusController implements vscode.Disposable {
     this.backoffMs ??= settings.pollMs;
     if (!this.provider.isEnabled()) {
       this.item.hide();
+      this.state = 'disabled';
+      this.publish();
       this.schedule(settings.pollMs);
       return;
     }
@@ -73,10 +79,12 @@ export class AgentStatusController implements vscode.Disposable {
         this.item.hide();
         this.usage = undefined;
         this.note = detected.reason;
+        this.state = 'unavailable';
         return;
       }
 
       this.item.show();
+      this.state = 'ok';
 
       if (!force) {
         const cache = await readCache<AgentUsage>(this.cacheFile);
@@ -133,6 +141,23 @@ export class AgentStatusController implements vscode.Disposable {
     });
     this.item.text = rendered.text;
     this.item.tooltip = rendered.tooltip;
+    this.publish();
+  }
+
+  private publish(): void {
+    const snapshot: AgentSnapshot = {
+      providerId: this.provider.id,
+      label: this.provider.label,
+      tooltipTitle: this.provider.tooltipTitle,
+      icon: this.provider.icon,
+      defaultPresentationMode: this.provider.defaultPresentationMode,
+      windowLabels: this.provider.windowLabels,
+      state: this.state,
+      usage: this.usage,
+      updatedAt: this.updatedAt,
+      note: this.note,
+    };
+    this.store.set(snapshot);
   }
 
   private maybeAlert(warnAt: number): void {

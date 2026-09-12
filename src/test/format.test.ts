@@ -4,6 +4,7 @@ import {
   agentPrefix,
   clampPercent,
   dot,
+  escapeHtml,
   escapeMarkdown,
   formatReset,
   meter,
@@ -11,6 +12,7 @@ import {
   pctShort,
   presentationPercent,
   remaining,
+  severity,
   statusPart,
 } from '../shared/format';
 
@@ -165,4 +167,31 @@ test('escapeMarkdown escapes markdown-significant characters', () => {
   assert.equal(escapeMarkdown('plain text'), 'plain text');
   assert.equal(escapeMarkdown('*bold* and _italic_'), '\\*bold\\* and \\_italic\\_');
   assert.equal(escapeMarkdown('[link](url)'), '\\[link\\]\\(url\\)');
+});
+
+test('severity classifies undefined as none', () => {
+  assert.equal(severity(undefined, 70, 90), 'none');
+});
+
+test('severity classifies below caution as ok', () => {
+  assert.equal(severity(10, 70, 90), 'ok');
+  assert.equal(severity(69.9, 70, 90), 'ok');
+});
+
+test('severity classifies [caution, warn) as caution', () => {
+  assert.equal(severity(70, 70, 90), 'caution');
+  assert.equal(severity(89.9, 70, 90), 'caution');
+});
+
+test('severity classifies warn and above as warn', () => {
+  assert.equal(severity(90, 70, 90), 'warn');
+  assert.equal(severity(100, 70, 90), 'warn');
+});
+
+test('escapeHtml escapes HTML-significant characters', () => {
+  assert.equal(escapeHtml(undefined), '');
+  assert.equal(escapeHtml(''), '');
+  assert.equal(escapeHtml('plain text'), 'plain text');
+  assert.equal(escapeHtml('<script>alert("x")</script>'), '&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;');
+  assert.equal(escapeHtml("a & b's <tag>"), 'a &amp; b&#39;s &lt;tag&gt;');
 });

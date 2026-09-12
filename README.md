@@ -37,6 +37,15 @@ Set `aiStatusBar.statusBarStyle` to `compact` for a narrower status bar that dro
 [codex] Codex: 🟢 5h: 69% · 🟢 wk: 51%   [claude] Claude: 🟢 5h: 100%
 ```
 
+## Sidebar Panel
+
+An **AI Usage** view in the activity bar mirrors the status-bar hover popups as an
+always-visible panel with real proportional usage bars, so you don't need to hover to
+check current usage. It shows the same information as the tooltip — plan, both usage
+windows with reset times, credits, and a rate-limit banner when applicable — and updates
+on the same schedule as the status bar; refresh it with the button in the panel's title
+bar (the same `AI Status Bar: Refresh` command).
+
 ## Screenshots
 
 ![AI Status Bar entries with usage hover details](assets/screenshots/status-bar-overview.png)
@@ -61,6 +70,7 @@ It also replaces separate status-bar experiments with one shared implementation.
 - Shows one status-bar item per detected agent.
 - Displays a `5h` primary gauge plus an optional weekly gauge, or a compact percentage-only style.
 - Keeps agent hover popups visually consistent across providers.
+- Mirrors that same usage as an always-visible sidebar panel with real proportional bars.
 - Uses shared settings for polling, gauge width, threshold colors, locale, and presentation mode.
 - Caches usage snapshots to avoid unnecessary API/process calls across windows.
 - Warns when usage crosses the configured threshold.

@@ -34,11 +34,22 @@ export function presentationPercent(
   return mode === 'remaining' ? remaining(used) : used;
 }
 
+export type Severity = 'none' | 'ok' | 'caution' | 'warn';
+
+export function severity(used: number | undefined, caution = CAUTION_AT, warn = WARN_AT): Severity {
+  if (used === undefined) return 'none';
+  if (used >= warn) return 'warn';
+  if (used >= caution) return 'caution';
+  return 'ok';
+}
+
 export function dot(used: number | undefined, caution = CAUTION_AT, warn = WARN_AT): string {
-  if (used === undefined) return '○';
-  if (used >= warn) return '🔴';
-  if (used >= caution) return '🟡';
-  return '🟢';
+  switch (severity(used, caution, warn)) {
+    case 'none': return '○';
+    case 'warn': return '🔴';
+    case 'caution': return '🟡';
+    default: return '🟢';
+  }
 }
 
 export function formatReset(
@@ -94,4 +105,17 @@ export function agentPrefix(label: string, icon: string, style: AgentNameStyle):
 export function escapeMarkdown(value: string | undefined): string {
   if (!value) return '';
   return value.replace(/[\\`*_{}[\]()#+\-.!|]/g, '\\$&');
+}
+
+const HTML_ESCAPES: Record<string, string> = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+};
+
+export function escapeHtml(value: string | undefined): string {
+  if (!value) return '';
+  return value.replace(/[&<>"']/g, (char) => HTML_ESCAPES[char]);
 }

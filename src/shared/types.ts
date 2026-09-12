@@ -51,6 +51,21 @@ export interface AgentProvider {
   fetchUsage(): Promise<AgentUsage>;
 }
 
+export type AgentSnapshotState = 'ok' | 'disabled' | 'unavailable';
+
+export interface AgentSnapshot {
+  providerId: string;
+  label: string;
+  tooltipTitle: string;
+  icon: string;
+  defaultPresentationMode: PresentationMode;
+  windowLabels?: AgentProvider['windowLabels'];
+  state: AgentSnapshotState;
+  usage?: AgentUsage;
+  updatedAt?: Date;
+  note?: string;
+}
+
 export interface AgentSettings {
   pollMs: number;
   cells: number;

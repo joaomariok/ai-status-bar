@@ -1,9 +1,10 @@
 # Architecture
 
 The extension has one job: poll a handful of `AgentProvider` implementations on a
-timer and render their usage into status-bar items. All shared behavior —
-polling, caching, backoff, rendering, settings — lives in `src/shared/`; each
-agent's data-fetching lives in its own file under `src/agents/`.
+timer and render their usage — into status-bar items, and into the sidebar
+panel described below. All shared behavior — polling, caching, backoff,
+rendering, settings — lives in `src/shared/`; each agent's data-fetching lives
+in its own file under `src/agents/`.
 
 ```mermaid
 flowchart LR
@@ -18,6 +19,10 @@ flowchart LR
     Controller1 --> Renderer[renderStatus]
     Controller2 --> Renderer
     Renderer --> StatusBar[vscode.StatusBarItem]
+    Controller1 --> Store[UsageStore]
+    Controller2 --> Store
+    Store --> ViewProvider[UsageViewProvider]
+    ViewProvider --> Panel[Sidebar webview]
 ```
 
 ## Activation and ordering
@@ -120,3 +125,36 @@ Status-bar window text (e.g. `5h ▰▱▱ 34%`) is built by `statusPart()` in
 rendering, so it's directly unit-testable. The `statusBarStyle` setting
 switches its output between the `full` gauge form and a `compact`
 `label: pct` form; the tooltip is unaffected either way.
+
+## Sidebar panel
+
+The activity-bar view (`AI Usage` → `aiStatusBar.usage`) mirrors the tooltip's
+content with real proportional bars instead of block-glyph gauges, and stays
+visible without hovering.
+
+It is a pure **consumer** of the controller's poll results, not a second
+poller: `AgentStatusController.render()` — called on every completed poll,
+success or failure — also calls a `publish()` that pushes an `AgentSnapshot`
+(the provider's descriptor fields plus current `usage`/`updatedAt`/`note`) into
+a shared [`UsageStore`](../src/shared/usageStore.ts). The two early-return
+paths that skip `render()` entirely (`!isEnabled()` and, transitively, provider
+disposal) publish an explicit `disabled` snapshot instead, so the panel never
+goes stale just because the status bar item is hidden. This is why adding the
+panel required no second Codex process spawn or extra Anthropic API call.
+
+[`UsageViewProvider`](../src/panel/usageViewProvider.ts) subscribes to the
+store and, on change, rebuilds the view from two pure, `vscode`-free modules:
+
+- [`panelModel.ts`](../src/shared/panelModel.ts) — turns snapshots + settings
+  into presentation-ready rows (percent text, severity, reset text, credits
+  shape), the same job `renderTooltip()` does for the tooltip.
+- [`panelHtml.ts`](../src/shared/panelHtml.ts) — renders that model to an HTML
+  string, escaping all dynamic text through `escapeHtml()`.
+
+The webview has `enableScripts: false` and a `script-src 'none'` CSP by
+design — refresh is the existing `aiStatusBar.refresh` command exposed as a
+view-title button, so there is no in-page JavaScript and no message-passing
+surface to keep secure. Because `retainContextWhenHidden` is `false`, VS Code
+disposes the webview while the panel isn't visible; `resolveWebviewView`
+re-renders from the store's current state on every re-reveal, so a hidden
+panel costs nothing and never shows a stale snapshot when reopened.
