@@ -3,28 +3,28 @@
   "displayName": "AI Status Bar",
   "description": "Track Codex and Claude Code usage in the VS Code status bar.",
   "version": "1.0.0",
-  "publisher": "tolbxela",
+  "publisher": "joaomariok",
   "galleryBanner": {
     "color": "#111827",
     "theme": "dark"
   },
   "author": {
-    "name": "Tolbxela"
+    "name": "joaomariok"
   },
   "maintainers": [
     {
-      "name": "Tolbxela"
+      "name": "joaomariok"
     }
   ],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tolbxela/ai-status-bar.git"
+    "url": "https://github.com/joaomariok/ai-status-bar.git"
   },
   "bugs": {
-    "url": "https://github.com/tolbxela/ai-status-bar/issues"
+    "url": "https://github.com/joaomariok/ai-status-bar/issues"
   },
-  "homepage": "https://github.com/tolbxela/ai-status-bar#readme",
+  "homepage": "https://github.com/joaomariok/ai-status-bar#readme",
   "keywords": [
     "ai",
     "ai-agents",
