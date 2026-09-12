@@ -1,135 +1,107 @@
 # AI Status Bar
 
-AI Status Bar tracks AI coding-agent usage directly in the VS Code status bar.
+Track **Codex** and **Claude Code** usage without leaving VS Code. AI Status Bar
+keeps your active usage windows, reset times, plan details, credits, and rate-limit
+state in the status bar and an always-visible sidebar panel.
 
-It currently supports:
+**Supported agents:** Codex and Claude Code · **Platform:** tested on Windows;
+macOS and Linux are best-effort.
 
-- **Codex** usage from `codex app-server`
-- **Claude Code** usage from Claude's local OAuth credentials and usage endpoint
+![AI Status Bar showing Codex and Claude Code usage in the VS Code status bar](assets/screenshots/status-bar-overview.png)
 
-When multiple agents are available, they appear side by side in the status bar, each with its own hover popup for active usage windows, reset times, known plan details, credits, and last update time.
+One compact entry per available agent—visible where you already work.
 
-> Platform note: this extension has only been tested on **Windows**. macOS and Linux support is best-effort: Claude should work if credentials are in the standard location, and Codex should work if `codex app-server` is available on `PATH` or in a known extension install location.
+## What you get
 
-## Status Bar
+- **Usage at a glance.** See the primary `5h` window and an optional weekly or
+  billing-cycle window, with clear status indicators.
+- **Details when you need them.** Hover an entry for reset times, plan details,
+  credits, rate-limit information, and the last update time.
+- **A sidebar view.** The **AI Usage** activity-bar panel mirrors the hover
+  details with proportional usage bars and a refresh button.
+- **Useful defaults, flexible display.** Keep each agent's native used/remaining
+  presentation, or choose a single style for every agent.
+- **Private by design.** The extension accesses only the usage data it needs and
+  never persists Claude OAuth tokens.
 
-By default:
+## See it in action
 
-- Codex shows remaining usage.
-- Claude shows used usage.
+Hover either status-bar entry for the active usage windows and account details.
 
-You can keep those native defaults or force all agents to show either used or remaining percentages with `aiStatusBar.presentationMode`.
+![Codex usage hover popup with primary and weekly gauges, reset times, plan, and credits](assets/screenshots/tooltip-codex.png)
 
-Each agent is prefixed with its brand icon by default. Example status-bar shape
-(`[codex]`/`[claude]` stand in for the rendered icons):
+![Claude Code usage hover popup with 5-hour and weekly gauges and reset times](assets/screenshots/tooltip-claude-code.png)
 
-```text
-[codex] Codex: 🟢 5h ▰▰▱ 69% · 🟢 wk ▰▰▱ 51%   [claude] Claude: 🟢 5h ▰▰▰ 100%
+## Install in VS Code
+
+AI Status Bar is distributed as a `.vsix` release package.
+
+1. Download the latest `ai-status-bar-<version>.vsix` from the
+   [GitHub Releases page](https://github.com/joaomariok/ai-status-bar/releases).
+2. In VS Code, open the Command Palette and choose **Extensions: Install from
+   VSIX...**.
+3. Select the downloaded `.vsix` file, then run **Developer: Reload Window**.
+
+### Install from the command line
+
+If the VS Code `code` command is available on your `PATH`, install the same
+downloaded file with:
+
+```sh
+code --install-extension ai-status-bar-<version>.vsix --force
 ```
 
-Set `aiStatusBar.agentNameStyle` to `icon` to drop the name and keep only the icon
-(dot-separated from the usage windows, like `[codex] · 🟢 5h ▰▰▱ 69% · 🟢 wk ▰▰▱ 51%`),
-or to `text` to go back to name-only with no icon.
+## First run
 
-Set `aiStatusBar.statusBarStyle` to `compact` for a narrower status bar that drops the gauges and shows just the percentages:
+Before the extension can show an agent, that agent must already be signed in and
+available on your machine:
 
-```text
-[codex] Codex: 🟢 5h: 69% · 🟢 wk: 51%   [claude] Claude: 🟢 5h: 100%
+- **Claude Code:** sign in with Claude Code so its standard
+  `~/.claude/.credentials.json` file exists and contains valid credentials.
+- **Codex:** install and sign in to Codex. AI Status Bar checks known installation
+  locations and `PATH`; for a custom installation, set `aiStatusBar.codex.command`
+  to the full executable path.
+
+Reload VS Code after installation. Look at the right side of the status bar; if
+both agents are detected, each gets its own entry. Open the **AI Usage** view in
+the activity bar when you want the same information to stay visible.
+
+> **Windows-tested:** macOS and Linux support is best-effort. Claude should work
+> when credentials are in the standard location; Codex should work when
+> `codex app-server` is available on `PATH` or in a known extension install
+> location. See [macOS and Linux](#macos-and-linux) for details.
+
+## Customize
+
+The default display shows **remaining** Codex usage and **used** Claude usage. To
+use one presentation across both agents, choose `aiStatusBar.presentationMode`:
+
+- `agentDefault` keeps each agent's native display style.
+- `used` shows used percentages for every agent.
+- `remaining` shows remaining percentages for every agent.
+
+You can also use `aiStatusBar.statusBarStyle: "compact"` to show percentages
+without gauges, and `aiStatusBar.agentNameStyle: "icon"` for icon-only entries.
+Open Settings and search for **AI Status Bar**, or edit `settings.json` directly.
+
+For example:
+
+```json
+{
+  "aiStatusBar.presentationMode": "remaining",
+  "aiStatusBar.statusBarStyle": "compact",
+  "aiStatusBar.locale": "de-DE",
+  "aiStatusBar.warnAt": 90,
+  "aiStatusBar.claude.enabled": true,
+  "aiStatusBar.codex.enabled": true,
+  "aiStatusBar.codex.command": "C:\\Users\\you\\AppData\\Roaming\\npm\\node_modules\\@openai\\codex\\node_modules\\@openai\\codex-win32-x64\\vendor\\x86_64-pc-windows-msvc\\codex\\codex.exe"
+}
 ```
 
-## Sidebar Panel
+Use **AI Status Bar: Refresh** from the Command Palette whenever you want to
+refresh usage immediately.
 
-An **AI Usage** view in the activity bar mirrors the status-bar hover popups as an
-always-visible panel with real proportional usage bars, so you don't need to hover to
-check current usage. It shows the same information as the tooltip — plan, both usage
-windows with reset times, credits, and a rate-limit banner when applicable — and updates
-on the same schedule as the status bar; refresh it with the button in the panel's title
-bar (the same `AI Status Bar: Refresh` command).
-
-## Screenshots
-
-![AI Status Bar entries with usage hover details](assets/screenshots/status-bar-overview.png)
-
-Codex and Claude Code each get their own compact status-bar item. Hover any entry to see usage windows, reset times, credits, plan details, and the last update time.
-
-![Codex usage hover details](assets/screenshots/tooltip-codex.png)
-
-![Claude Code usage hover details](assets/screenshots/tooltip-claude-code.png)
-
-## Why I Created This
-
-I use multiple AI coding agents during the same development workflow. Codex and Claude Code each have their own limits, reset windows, plan details, and credit state, but that information is easy to lose track of while coding.
-
-This extension was created to make that usage visible without opening separate tools, running commands, or switching context. The goal is simple: keep the current state of the AI agents I rely on in the same place I already look all day, the editor status bar.
-
-It also replaces separate status-bar experiments with one shared implementation. The agent-specific parts stay separate, but common behavior such as polling, caching, rendering, settings, warnings, and popup layout is centralized for easier maintenance.
-
-## Features
-
-- Detects Claude Code and Codex automatically.
-- Shows one status-bar item per detected agent.
-- Displays a `5h` primary gauge plus an optional weekly gauge, or a compact percentage-only style.
-- Keeps agent hover popups visually consistent across providers.
-- Mirrors that same usage as an always-visible sidebar panel with real proportional bars.
-- Uses shared settings for polling, gauge width, threshold colors, locale, and presentation mode.
-- Caches usage snapshots to avoid unnecessary API/process calls across windows.
-- Warns when usage crosses the configured threshold.
-
-## How To Use It
-
-1. Download the latest `ai-status-bar-<version>.vsix` from the [GitHub Releases page](https://github.com/joaomariok/ai-status-bar/releases), or build one locally (see [Build](#build)), then install it:
-
-   ```sh
-   code --install-extension ai-status-bar-<version>.vsix --force
-   ```
-
-2. Make sure the agents you want to monitor are signed in and usable:
-
-   - Claude Code should have a valid `~/.claude/.credentials.json`.
-   - Codex should be able to run `codex app-server`.
-
-3. Reload VS Code.
-
-4. Look at the right side of the status bar.
-
-   If multiple agents are detected, you should see multiple status-bar entries. Hover each entry to see its detailed popup.
-
-5. Optional: tune settings under `AI Status Bar`.
-
-   Useful first settings:
-
-   ```json
-   {
-     "aiStatusBar.presentationMode": "agentDefault",
-     "aiStatusBar.pollSeconds": 120,
-     "aiStatusBar.locale": "de-DE"
-   }
-   ```
-
-Use the command palette commands when needed:
-
-- `AI Status Bar: Refresh`
-
-## How It Works
-
-The extension only collects enough local usage data to show status-bar percentages and hover details.
-
-Each agent provider is read-only from the agent's point of view:
-
-- Codex usage is requested through Codex's local app-server. The extension does not read Codex auth files directly.
-- Claude usage uses the existing local Claude Code sign-in token. The token is kept in memory only and is not written to the extension cache.
-
-The extension stores normalized usage snapshots in its own VS Code extension storage so multiple editor windows do not have to repeatedly query the same data. Those snapshots contain usage details, not agent credentials.
-
-### Codex
-
-Codex handles its own authentication. AI Status Bar asks the local Codex app-server for usage limits and does not inspect Codex credential files.
-
-### Claude Code
-
-Claude Code authentication stays with Claude Code. AI Status Bar uses the existing local sign-in token to request usage, keeps that token in memory only, and caches only the resulting usage snapshot.
-
-## Settings
+### Settings reference
 
 All settings are under `aiStatusBar`.
 
@@ -149,25 +121,23 @@ All settings are under `aiStatusBar`.
 | `codex.enabled` | `true` | Enable or disable Codex detection and display. |
 | `codex.command` | `codex` | Codex executable path or command. This is machine-scoped for safety. |
 
-Example:
+## Privacy and security
 
-```json
-{
-  "aiStatusBar.presentationMode": "remaining",
-  "aiStatusBar.statusBarStyle": "compact",
-  "aiStatusBar.locale": "de-DE",
-  "aiStatusBar.warnAt": 90,
-  "aiStatusBar.claude.enabled": true,
-  "aiStatusBar.codex.enabled": true,
-  "aiStatusBar.codex.command": "C:\\Users\\you\\AppData\\Roaming\\npm\\node_modules\\@openai\\codex\\node_modules\\@openai\\codex-win32-x64\\vendor\\x86_64-pc-windows-msvc\\codex\\codex.exe"
-}
-```
+AI Status Bar is intentionally read-only from the agents' point of view.
+
+- **Leaves your device:** Claude usage requests go to Anthropic's OAuth usage
+  endpoint using Claude Code's existing OAuth token.
+- **Stays local:** Codex usage is requested from a local `codex app-server`
+  process; normalized usage snapshots are cached in VS Code extension storage.
+- **Never persists:** Claude OAuth tokens and raw credential-file contents are not
+  written to the extension cache.
+
+See [PRIVACY.md](PRIVACY.md) for the complete technical data-flow, security-boundary,
+and scope details.
 
 ## macOS and Linux
 
-This extension is **not yet tested** on macOS or Linux.
-
-Best-effort support is included:
+This extension is not yet tested on macOS or Linux. Best-effort support is included:
 
 - Claude uses `~/.claude/.credentials.json`, which should be platform-neutral.
 - Codex first checks known bundled binary locations for the current platform.
@@ -179,57 +149,34 @@ For non-Windows environments, first verify this works in a terminal:
 codex app-server
 ```
 
-If Codex is installed somewhere custom, set `aiStatusBar.codex.command` to the full executable path in user or machine settings.
+If Codex is installed somewhere custom, set `aiStatusBar.codex.command` to the full
+executable path in user or machine settings.
 
-## Privacy and Security
+## Build and contribute
 
-This extension is intentionally read-only from the agents' point of view.
-
-What it reads:
-
-- Claude's local credentials file, only to get the existing OAuth token.
-- Codex usage data through `codex app-server`.
-- Its own cache files under VS Code extension storage.
-
-What it writes:
-
-- Usage snapshot cache files under VS Code extension storage.
-
-What it does not do:
-
-- It does not write, replace, or refresh Claude credentials.
-- It does not read Codex auth files directly.
-- It does not transmit tokens to any third-party service.
-- It does not trust workspace settings for the Codex executable path.
-
-Security choices:
-
-- Claude OAuth tokens are kept in memory only.
-- Usage cache files contain usage snapshots, not credentials.
-- `aiStatusBar.codex.command` is machine-scoped so a workspace cannot override it with a repository-local executable.
-- `.cmd` and `.bat` Codex shims are rejected on Windows to avoid future shell-injection footguns.
-- Tooltip content from APIs and process output is escaped before rendering.
-- Codex child processes are cleaned up on timeout, failure, and extension disposal.
-
-## Build
+To build a local `.vsix` package:
 
 ```sh
 npm install
 npm run pack
 ```
 
-The generated `.vsix` can be installed with:
+Install the generated package with:
 
 ```sh
 code --install-extension ai-status-bar-<version>.vsix --force
 ```
 
-See `PRIVACY.md` for local data notes and `CHANGELOG.md` for release history.
+For local development, the watch loop, Extension Development Host, and test workflow,
+see [docs/development.md](docs/development.md).
+
+See [CHANGELOG.md](CHANGELOG.md) for release history.
 
 ## Limitations
 
 - The extension is unofficial.
-- Claude usage uses an internal/undocumented endpoint and may break if Claude changes it.
+- Claude usage uses an internal/undocumented endpoint and may break if Claude
+  changes it.
 - Codex support depends on the local `codex app-server` protocol.
 - Windows is the only tested platform at this time.
 - The Claude and Codex status-bar icons are unmodified monochrome marks from a
