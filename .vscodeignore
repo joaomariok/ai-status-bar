@@ -1,15 +1,21 @@
 .git/**
 .github/**
+.vscode/**
 .vscode-test/**
 node_modules/**
 src/**
+out/test/**
 tmp/**
 versions/**
+docs/**
+scripts/**
 
 .vscodeignore
 .gitignore
 package-lock.json
 tsconfig.json
+AGENTS.md
+CLAUDE.md
 *.vsix
 *.zip
 *.log

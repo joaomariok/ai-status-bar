@@ -190,8 +190,12 @@
   },
   "scripts": {
     "bump:compile": "npm version patch --no-git-tag-version && npm run compile",
+    "clean": "node scripts/clean.mjs",
     "compile": "tsc -p ./",
+    "gate": "node scripts/gate.mjs",
     "pack": "npm run compile && vsce package",
+    "test": "npm run compile && node --test out/test/*.test.js",
+    "typecheck": "tsc --noEmit -p ./",
     "watch": "tsc -watch -p ./"
   },
   "devDependencies": {
