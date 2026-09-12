@@ -1,7 +1,7 @@
 # AGENTS.md
 
-AI Status Bar is a VS Code extension that shows Codex, Claude Code, and Devin
-usage in the status bar.
+AI Status Bar is a VS Code extension that shows Codex and Claude Code usage in
+the status bar.
 
 Read [docs/index.md](docs/index.md) for repository knowledge beyond this file:
 architecture, agent-provider internals, development workflow, and
@@ -23,8 +23,8 @@ Typecheck → tests → packaging dry-run. See
 - Never log, cache, or persist the Claude OAuth token — it must stay
   in-memory only for the lifetime of one fetch. See
   [docs/agent-providers.md](docs/agent-providers.md#claude).
-- Keep `codex.command` and all `devin.*` settings `scope: "machine"` in
-  `package.json` — this is a deliberate security boundary, not an oversight.
+- Keep `codex.command` `scope: "machine"` in `package.json` — this is a
+  deliberate security boundary, not an oversight.
 - Route all dynamic tooltip text through `escapeMarkdown()`
   (`src/shared/format.ts`) before rendering.
 - Adding or changing an `aiStatusBar.*` setting touches **three** places:

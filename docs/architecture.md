@@ -7,27 +7,23 @@ agent's data-fetching lives in its own file under `src/agents/`.
 
 ```mermaid
 flowchart LR
-    activate["activate()\nsrc/extension.ts"] -->|constructs, in order| Codex
+    activate[activate in extension.ts] -->|constructs, in order| Codex
     activate --> Claude
-    activate --> Devin
     subgraph Providers
         Codex[CodexProvider]
         Claude[ClaudeProvider]
-        Devin[DevinProvider]
     end
     Codex --> Controller1[AgentStatusController]
     Claude --> Controller2[AgentStatusController]
-    Devin --> Controller3[AgentStatusController]
-    Controller1 --> Renderer[renderStatus()]
+    Controller1 --> Renderer[renderStatus]
     Controller2 --> Renderer
-    Controller3 --> Renderer
     Renderer --> StatusBar[vscode.StatusBarItem]
 ```
 
 ## Activation and ordering
 
 [`src/extension.ts`](../src/extension.ts) runs on `onStartupFinished` and constructs
-providers in a **fixed array order: Codex, Claude, Devin**. This order matters
+providers in a **fixed array order: Codex, Claude**. This order matters
 twice:
 
 - Status-bar priority is `100 - index`, so **array order determines left-to-right
@@ -87,13 +83,12 @@ implements `isEnabled()`, `detect()`, `fetchUsage()`, and declares
 
 **`AgentUsage.fiveHour` / `.weekly` are positional slots, not literal time
 windows.** They're rendered as "primary" and "secondary" gauges regardless of
-what they actually represent — Devin relabels them to `day`/`cy` via
-`windowLabels`. Label resolution order is
+what they actually represent. Label resolution order is
 `usage.windowLabels ?? provider.windowLabels ?? hardcoded default`
-([renderer.ts](../src/shared/renderer.ts) L30; per-fetch labels, e.g. Devin's
-local-cache path setting `fiveHourTooltip: 'Daily quota'`, override the
-provider's static labels — see
-[`devin.ts`](../src/agents/devin.ts#L346-L353)).
+([renderer.ts](../src/shared/renderer.ts) L30) — a per-fetch `windowLabels` on
+the returned `AgentUsage` would override a provider's static `windowLabels`,
+but neither current provider (Codex, Claude) uses this override; both rely on
+the hardcoded `5h`/`wk` default.
 
 `replacePrimaryWithWeeklyOnLimit` (a global setting) swaps which slot renders
 in the primary status-bar position when the secondary window's `usedPercent`

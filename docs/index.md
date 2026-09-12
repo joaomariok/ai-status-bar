@@ -5,7 +5,7 @@ Start here, then load only the document you need.
 | Document | Read it when you need to know... |
 | --- | --- |
 | [architecture.md](architecture.md) | How activation, polling, caching, backoff, and rendering fit together; the `AgentProvider` contract shared by all agents. |
-| [agent-providers.md](agent-providers.md) | How Codex, Claude Code, and Devin usage is actually obtained (protocols, file locations, quirks). |
+| [agent-providers.md](agent-providers.md) | How Codex and Claude Code usage is actually obtained (protocols, file locations, quirks). |
 | [development.md](development.md) | Local setup, the watch loop, F5 debugging, the gate, and how tests are structured. |
 | [build-and-release.md](build-and-release.md) | Versioning, packaging with `vsce`, what ships in the `.vsix`. |
 | [next-steps.md](next-steps.md) | Deliberately out-of-scope tooling and known debt. |

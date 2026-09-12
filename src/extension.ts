@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import { ClaudeProvider } from './agents/claude';
 import { CodexProvider } from './agents/codex';
-import { DevinProvider } from './agents/devin';
 import { AgentStatusController } from './shared/statusController';
 
 const INITIAL_POLL_DELAY_MS = 3_000;
@@ -11,7 +10,6 @@ export function activate(context: vscode.ExtensionContext): void {
   const providers = [
     new CodexProvider(),
     new ClaudeProvider(),
-    new DevinProvider(),
   ];
 
   const controllers = providers.map((provider, index) => {

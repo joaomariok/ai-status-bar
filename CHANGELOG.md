@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Removed Devin usage monitoring, its settings, and its API fallback.
+
 ## 1.0.0 - 2026-06-20
 
 - Renamed the extension to **AI Status Bar**.

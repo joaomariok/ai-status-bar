@@ -182,7 +182,6 @@ function extensionRoots(): string[] {
     path.join(home, '.vscode', 'extensions'),
     path.join(home, '.vscode-insiders', 'extensions'),
     path.join(home, '.cursor', 'extensions'),
-    path.join(home, '.devin', 'extensions'),
   ];
 
   if (process.platform === 'darwin') {

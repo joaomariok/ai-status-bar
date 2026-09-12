@@ -6,7 +6,6 @@ It currently supports:
 
 - **Codex** usage from `codex app-server`
 - **Claude Code** usage from Claude's local OAuth credentials and usage endpoint
-- **Devin** usage from Devin's local IDE usage cache, with optional JSON/API fallbacks
 
 When multiple agents are available, they appear side by side in the status bar, each with its own hover popup for active usage windows, reset times, known plan details, credits, and last update time.
 
@@ -18,31 +17,28 @@ By default:
 
 - Codex shows remaining usage.
 - Claude shows used usage.
-- Devin shows used quota usage from the local IDE cache.
 
 You can keep those native defaults or force all agents to show either used or remaining percentages with `aiStatusBar.presentationMode`.
 
 Example status-bar shape:
 
 ```text
-Codex: 🟢 5h ▰▰▱ 69% · 🟢 wk ▰▰▱ 51%   Claude: 🟢 5h ▰▰▰ 100%   Devin: 🟢 day ▰▰▰ 100%
+Codex: 🟢 5h ▰▰▱ 69% · 🟢 wk ▰▰▱ 51%   Claude: 🟢 5h ▰▰▰ 100%
 ```
 
 ## Screenshots
 
-![AI Status Bar entries with Devin usage hover details](assets/screenshots/status-bar-overview.png)
+![AI Status Bar entries with usage hover details](assets/screenshots/status-bar-overview.png)
 
-Codex, Claude Code, and Devin each get their own compact status-bar item. Hover any entry to see usage windows, reset times, credits, plan details, and the last update time.
+Codex and Claude Code each get their own compact status-bar item. Hover any entry to see usage windows, reset times, credits, plan details, and the last update time.
 
 ![Codex usage hover details](assets/screenshots/tooltip-codex.png)
 
 ![Claude Code usage hover details](assets/screenshots/tooltip-claude-code.png)
 
-![Devin usage hover details](assets/screenshots/tooltip-devin.png)
-
 ## Why I Created This
 
-I use multiple AI coding agents during the same development workflow. Codex, Claude Code, and Devin each have their own limits, reset windows, plan details, and credit state, but that information is easy to lose track of while coding.
+I use multiple AI coding agents during the same development workflow. Codex and Claude Code each have their own limits, reset windows, plan details, and credit state, but that information is easy to lose track of while coding.
 
 This extension was created to make that usage visible without opening separate tools, running commands, or switching context. The goal is simple: keep the current state of the AI agents I rely on in the same place I already look all day, the editor status bar.
 
@@ -50,9 +46,9 @@ It also replaces separate status-bar experiments with one shared implementation.
 
 ## Features
 
-- Detects Claude Code, Codex, and Devin automatically.
+- Detects Claude Code and Codex automatically.
 - Shows one status-bar item per detected agent.
-- Displays compact primary gauges (`5h` for Codex/Claude, `day` for Devin) plus an optional weekly or cycle gauge.
+- Displays a compact `5h` primary gauge plus an optional weekly gauge.
 - Keeps agent hover popups visually consistent across providers.
 - Uses shared settings for polling, gauge width, threshold colors, locale, and presentation mode.
 - Caches usage snapshots to avoid unnecessary API/process calls across windows.
@@ -70,7 +66,6 @@ It also replaces separate status-bar experiments with one shared implementation.
 
    - Claude Code should have a valid `~/.claude/.credentials.json`.
    - Codex should be able to run `codex app-server`.
-   - Devin should have been opened at least once so the local IDE usage cache exists.
 
 3. Reload VS Code.
 
@@ -102,7 +97,6 @@ Each agent provider is read-only from the agent's point of view:
 
 - Codex usage is requested through Codex's local app-server. The extension does not read Codex auth files directly.
 - Claude usage uses the existing local Claude Code sign-in token. The token is kept in memory only and is not written to the extension cache.
-- Devin usage is read from the local IDE usage cache when available. The Devin API fallback is used only when configured with `DEVIN_API_KEY`.
 
 The extension stores normalized usage snapshots in its own VS Code extension storage so multiple editor windows do not have to repeatedly query the same data. Those snapshots contain usage details, not agent credentials.
 
@@ -113,10 +107,6 @@ Codex handles its own authentication. AI Status Bar asks the local Codex app-ser
 ### Claude Code
 
 Claude Code authentication stays with Claude Code. AI Status Bar uses the existing local sign-in token to request usage, keeps that token in memory only, and caches only the resulting usage snapshot.
-
-### Devin
-
-For the normal Devin IDE case, AI Status Bar reads only the cached plan and usage fields already stored locally by Devin. No `DEVIN_API_KEY` is needed unless you choose to use the API fallback.
 
 ## Settings
 
@@ -135,12 +125,6 @@ All settings are under `aiStatusBar`.
 | `claude.enabled` | `true` | Enable or disable Claude Code detection and display. |
 | `codex.enabled` | `true` | Enable or disable Codex detection and display. |
 | `codex.command` | `codex` | Codex executable path or command. This is machine-scoped for safety. |
-| `devin.enabled` | `true` | Enable or disable Devin detection and display. |
-| `devin.apiKeyEnv` | `DEVIN_API_KEY` | Optional environment variable containing a Devin `cog_` API key for the API fallback. |
-| `devin.orgId` | `""` | Devin organization ID for the API fallback. Usually discovered from `/v3/self` when the token allows it. |
-| `devin.userId` | `""` | Devin user ID to query for consumption in the API fallback. |
-| `devin.cycleAcuLimit` | `0` | Optional quota/ACU limit when the API does not return an organization cycle limit. |
-| `devin.usageFile` | `""` | Optional local JSON usage snapshot override. |
 
 Example:
 
@@ -151,8 +135,6 @@ Example:
   "aiStatusBar.warnAt": 90,
   "aiStatusBar.claude.enabled": true,
   "aiStatusBar.codex.enabled": true,
-  "aiStatusBar.devin.enabled": true,
-  "aiStatusBar.devin.userId": "user_...",
   "aiStatusBar.codex.command": "C:\\Users\\you\\AppData\\Roaming\\npm\\node_modules\\@openai\\codex\\node_modules\\@openai\\codex-win32-x64\\vendor\\x86_64-pc-windows-msvc\\codex\\codex.exe"
 }
 ```
@@ -183,8 +165,6 @@ What it reads:
 
 - Claude's local credentials file, only to get the existing OAuth token.
 - Codex usage data through `codex app-server`.
-- Devin's local IDE usage cache, or an optional local JSON file when configured.
-- Devin usage through the documented Devin API only when no local cache is available and `DEVIN_API_KEY` is set.
 - Its own cache files under VS Code extension storage.
 
 What it writes:
@@ -195,7 +175,6 @@ What it does not do:
 
 - It does not write, replace, or refresh Claude credentials.
 - It does not read Codex auth files directly.
-- It does not read Devin browser/session auth secrets directly.
 - It does not transmit tokens to any third-party service.
 - It does not trust workspace settings for the Codex executable path.
 
@@ -204,7 +183,6 @@ Security choices:
 - Claude OAuth tokens are kept in memory only.
 - Usage cache files contain usage snapshots, not credentials.
 - `aiStatusBar.codex.command` is machine-scoped so a workspace cannot override it with a repository-local executable.
-- Devin API settings are machine-scoped, and the API key is read from an environment variable rather than stored in settings.
 - `.cmd` and `.bat` Codex shims are rejected on Windows to avoid future shell-injection footguns.
 - Tooltip content from APIs and process output is escaped before rendering.
 - Codex child processes are cleaned up on timeout, failure, and extension disposal.
@@ -230,5 +208,4 @@ See `PRIVACY.md` for local data notes and `CHANGELOG.md` for release history.
 - The extension is unofficial.
 - Claude usage uses an internal/undocumented endpoint and may break if Claude changes it.
 - Codex support depends on the local `codex app-server` protocol.
-- Devin API support requires a `cog_` API key with consumption permissions. Self-serve quota details may still require Devin's Settings > Plans page if not exposed to your token.
 - Windows is the only tested platform at this time.

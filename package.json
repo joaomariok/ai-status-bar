@@ -1,7 +1,7 @@
 {
   "name": "ai-status-bar",
   "displayName": "AI Status Bar",
-  "description": "Track Codex, Claude Code, and Devin usage in the VS Code status bar.",
+  "description": "Track Codex and Claude Code usage in the VS Code status bar.",
   "version": "1.0.0",
   "publisher": "tolbxela",
   "galleryBanner": {
@@ -34,7 +34,6 @@
     "rate-limits",
     "codex",
     "claude-code",
-    "devin",
     "developer-tools"
   ],
   "icon": "assets/icon.png",
@@ -137,52 +136,6 @@
             "default": "codex",
             "scope": "machine",
             "description": "Codex command or executable path used to start `codex app-server`."
-          }
-        }
-      },
-      {
-        "title": "AI Status Bar: Devin",
-        "properties": {
-          "aiStatusBar.devin.enabled": {
-            "type": "boolean",
-            "default": true,
-            "description": "Enable or disable Devin detection and status display."
-          },
-          "aiStatusBar.devin.apiKeyEnv": {
-            "type": "string",
-            "default": "DEVIN_API_KEY",
-            "scope": "machine",
-            "description": "Optional environment variable containing a Devin API key for the documented API fallback. Normal Devin IDE usage is read from the local Devin usage cache."
-          },
-          "aiStatusBar.devin.apiBaseUrl": {
-            "type": "string",
-            "default": "https://api.devin.ai",
-            "scope": "machine",
-            "description": "Base URL for the Devin API."
-          },
-          "aiStatusBar.devin.orgId": {
-            "type": "string",
-            "default": "",
-            "scope": "machine",
-            "description": "Devin organization ID. If empty, the extension tries to read it from `/v3/self`."
-          },
-          "aiStatusBar.devin.userId": {
-            "type": "string",
-            "default": "",
-            "scope": "machine",
-            "description": "Devin user ID to query for consumption."
-          },
-          "aiStatusBar.devin.cycleAcuLimit": {
-            "type": "number",
-            "default": 0,
-            "scope": "machine",
-            "description": "Optional Devin cycle ACU/quota limit. If unset or 0, the extension uses the organization cycle limit when the API returns one."
-          },
-          "aiStatusBar.devin.usageFile": {
-            "type": "string",
-            "default": "",
-            "scope": "machine",
-            "description": "Optional local JSON usage file override for Devin usage snapshots."
           }
         }
       }

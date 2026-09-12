@@ -7,5 +7,4 @@ Deliberately left out of the doc bootstrap:
 
 ## Known debt (not fixed, out of scope for the bootstrap)
 
-- `clampPercent` is duplicated verbatim in [`src/shared/format.ts`](../src/shared/format.ts) and [`src/agents/devin.ts`](../src/agents/devin.ts).
 - `CodexProvider.detect()`'s first branch (`resolved !== 'codex' || configured !== 'codex'`) is always true when reached — the "let fetchUsage make the final call" comment is dead code.
