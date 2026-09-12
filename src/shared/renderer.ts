@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { dot, escapeMarkdown, formatReset, meter, money, pctShort, presentationPercent } from './format';
+import { dot, escapeMarkdown, formatReset, meter, money, pctShort, presentationPercent, statusPart } from './format';
 import { AgentProvider, AgentSettings, AgentUsage, PresentationMode, UsageWindow } from './types';
 
 export interface RenderInput {
@@ -60,9 +60,13 @@ function renderBarPart(
   mode: PresentationMode,
   settings: AgentSettings,
 ): string {
-  const used = win?.usedPercent;
-  const display = presentationPercent(used, mode);
-  return `${dot(used, settings.cautionAt, settings.warnAt)} ${label} ${meter(display, settings.cells)} ${pctShort(display)}`;
+  return statusPart(label, win?.usedPercent, {
+    style: settings.statusBarStyle,
+    mode,
+    cells: settings.cells,
+    cautionAt: settings.cautionAt,
+    warnAt: settings.warnAt,
+  });
 }
 
 function renderTooltip(input: RenderInput, mode: PresentationMode): vscode.MarkdownString {

@@ -26,6 +26,12 @@ Example status-bar shape:
 Codex: 🟢 5h ▰▰▱ 69% · 🟢 wk ▰▰▱ 51%   Claude: 🟢 5h ▰▰▰ 100%
 ```
 
+Set `aiStatusBar.statusBarStyle` to `compact` for a narrower status bar that drops the gauges and shows just the percentages:
+
+```text
+Codex: 🟢 5h: 69% · 🟢 wk: 51%   Claude: 🟢 5h: 100%
+```
+
 ## Screenshots
 
 ![AI Status Bar entries with usage hover details](assets/screenshots/status-bar-overview.png)
@@ -48,7 +54,7 @@ It also replaces separate status-bar experiments with one shared implementation.
 
 - Detects Claude Code and Codex automatically.
 - Shows one status-bar item per detected agent.
-- Displays a compact `5h` primary gauge plus an optional weekly gauge.
+- Displays a `5h` primary gauge plus an optional weekly gauge, or a compact percentage-only style.
 - Keeps agent hover popups visually consistent across providers.
 - Uses shared settings for polling, gauge width, threshold colors, locale, and presentation mode.
 - Caches usage snapshots to avoid unnecessary API/process calls across windows.
@@ -115,7 +121,8 @@ All settings are under `aiStatusBar`.
 | Setting | Default | Description |
 | --- | --- | --- |
 | `pollSeconds` | `120` | How often to refresh usage data. |
-| `barCells` | `3` | Number of segments in the compact status-bar gauge. |
+| `barCells` | `3` | Number of segments in the status-bar gauge (`statusBarStyle: full` only). |
+| `statusBarStyle` | `full` | `full` (gauge + percentage) or `compact` (percentage only, no gauge). Does not affect the hover tooltip. |
 | `showWeekly` | `true` | Show the secondary weekly or billing-cycle usage window. The primary 5-hour or daily window is otherwise always shown. |
 | `replacePrimaryWithWeeklyOnLimit` | `true` | When the secondary weekly or billing-cycle limit is reached, show that exhausted budget in the primary status-bar slot instead of the 5-hour or daily budget. |
 | `presentationMode` | `agentDefault` | `agentDefault`, `used`, or `remaining`. |
@@ -131,6 +138,7 @@ Example:
 ```json
 {
   "aiStatusBar.presentationMode": "remaining",
+  "aiStatusBar.statusBarStyle": "compact",
   "aiStatusBar.locale": "de-DE",
   "aiStatusBar.warnAt": 90,
   "aiStatusBar.claude.enabled": true,

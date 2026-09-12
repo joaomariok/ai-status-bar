@@ -1,5 +1,6 @@
 export type PresentationMode = 'used' | 'remaining';
 export type ConfiguredPresentationMode = PresentationMode | 'agentDefault';
+export type StatusBarStyle = 'full' | 'compact';
 
 export interface AgentDetection {
   available: boolean;
@@ -57,4 +58,5 @@ export interface AgentSettings {
   warnAt: number;
   locale: string | undefined;
   presentationMode: ConfiguredPresentationMode;
+  statusBarStyle: StatusBarStyle;
 }

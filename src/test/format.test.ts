@@ -10,6 +10,7 @@ import {
   pctShort,
   presentationPercent,
   remaining,
+  statusPart,
 } from '../shared/format';
 
 test('clampPercent clamps to [0, 100]', () => {
@@ -94,6 +95,55 @@ test('money converts minor units using the given decimals and known currency sym
 
 test('money falls back to the currency code with a trailing space when unknown', () => {
   assert.equal(money(1000, 'JPY', 0), 'JPY 1000');
+});
+
+test('statusPart renders a gauge and percentage in full style', () => {
+  assert.equal(
+    statusPart('5h', 34, { style: 'full', mode: 'used', cells: 3, cautionAt: 70, warnAt: 90 }),
+    '🟢 5h ▰▱▱ 34%',
+  );
+});
+
+test('statusPart renders label and percentage without a gauge in compact style', () => {
+  assert.equal(
+    statusPart('5h', 34, { style: 'compact', mode: 'used', cells: 3, cautionAt: 70, warnAt: 90 }),
+    '🟢 5h: 34%',
+  );
+});
+
+test('statusPart compact style ignores the cells count', () => {
+  const withFewCells = statusPart('5h', 34, { style: 'compact', mode: 'used', cells: 3, cautionAt: 70, warnAt: 90 });
+  const withManyCells = statusPart('5h', 34, { style: 'compact', mode: 'used', cells: 10, cautionAt: 70, warnAt: 90 });
+  assert.equal(withFewCells, withManyCells);
+});
+
+test('statusPart handles an undefined used percent in both styles', () => {
+  assert.equal(
+    statusPart('5h', undefined, { style: 'full', mode: 'used', cells: 3, cautionAt: 70, warnAt: 90 }),
+    '○ 5h ▱▱▱ -',
+  );
+  assert.equal(
+    statusPart('5h', undefined, { style: 'compact', mode: 'used', cells: 3, cautionAt: 70, warnAt: 90 }),
+    '○ 5h: -',
+  );
+});
+
+test('statusPart inverts the percentage in remaining mode for both styles', () => {
+  assert.equal(
+    statusPart('5h', 34, { style: 'full', mode: 'remaining', cells: 3, cautionAt: 70, warnAt: 90 }),
+    '🟢 5h ▰▰▱ 66%',
+  );
+  assert.equal(
+    statusPart('5h', 34, { style: 'compact', mode: 'remaining', cells: 3, cautionAt: 70, warnAt: 90 }),
+    '🟢 5h: 66%',
+  );
+});
+
+test('statusPart applies warn threshold dot in compact style', () => {
+  assert.equal(
+    statusPart('5h', 95, { style: 'compact', mode: 'used', cells: 3, cautionAt: 70, warnAt: 90 }),
+    '🔴 5h: 95%',
+  );
 });
 
 test('escapeMarkdown escapes markdown-significant characters', () => {

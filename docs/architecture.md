@@ -114,3 +114,9 @@ state beyond the `note`/`updatedAt` fields the controller passes in. All
 dynamic tooltip text (credits text, plan name, error notes) is passed through
 `escapeMarkdown()` in [`format.ts`](../src/shared/format.ts) before rendering
 — required because provider payloads can contain arbitrary strings.
+
+Status-bar window text (e.g. `5h ▰▱▱ 34%`) is built by `statusPart()` in
+[`format.ts`](../src/shared/format.ts), the one vscode-free piece of
+rendering, so it's directly unit-testable. The `statusBarStyle` setting
+switches its output between the `full` gauge form and a `compact`
+`label: pct` form; the tooltip is unaffected either way.

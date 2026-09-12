@@ -96,6 +96,19 @@
             ],
             "description": "Whether usage gauges display used or remaining percentage."
           },
+          "aiStatusBar.statusBarStyle": {
+            "type": "string",
+            "default": "full",
+            "enum": [
+              "full",
+              "compact"
+            ],
+            "enumDescriptions": [
+              "Show a gauge and percentage for each usage window.",
+              "Show only the percentage for each usage window, without gauges."
+            ],
+            "description": "How much detail each agent's status-bar item shows. Does not affect the hover tooltip."
+          },
           "aiStatusBar.cautionAt": {
             "type": "number",
             "default": 70,

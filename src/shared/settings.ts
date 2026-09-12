@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { AgentSettings } from './types';
+import { AgentSettings, StatusBarStyle } from './types';
 import { CAUTION_AT, WARN_AT } from './format';
 
 const CONFIG_SECTION = 'aiStatusBar';
@@ -20,6 +20,7 @@ export function getSettings(): AgentSettings {
     warnAt: cfg.get<number>('warnAt') ?? WARN_AT,
     locale: cfg.get<string>('locale') || undefined,
     presentationMode: cfg.get<'agentDefault' | 'used' | 'remaining'>('presentationMode') ?? 'agentDefault',
+    statusBarStyle: cfg.get<StatusBarStyle>('statusBarStyle') ?? 'full',
   };
 }
 

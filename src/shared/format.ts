@@ -1,4 +1,4 @@
-import { PresentationMode } from './types';
+import { PresentationMode, StatusBarStyle } from './types';
 
 export const CAUTION_AT = 70;
 export const WARN_AT = 90;
@@ -58,6 +58,25 @@ export function formatReset(
 export function money(minor: number, currency = 'USD', decimals = 2): string {
   const symbol = CURRENCY[currency] ?? `${currency} `;
   return `${symbol}${(minor / 10 ** decimals).toFixed(decimals)}`;
+}
+
+export function statusPart(
+  label: string,
+  used: number | undefined,
+  opts: {
+    style: StatusBarStyle;
+    mode: PresentationMode;
+    cells: number;
+    cautionAt: number;
+    warnAt: number;
+  },
+): string {
+  const display = presentationPercent(used, opts.mode);
+  const dotGlyph = dot(used, opts.cautionAt, opts.warnAt);
+
+  return opts.style === 'compact'
+    ? `${dotGlyph} ${label}: ${pctShort(display)}`
+    : `${dotGlyph} ${label} ${meter(display, opts.cells)} ${pctShort(display)}`;
 }
 
 export function escapeMarkdown(value: string | undefined): string {
