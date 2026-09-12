@@ -12,8 +12,10 @@ before touching a provider.
 ## Claude
 
 Reads `~/.claude/.credentials.json`, taking
-`claudeAiOauth.accessToken` (falling back to a top-level `accessToken`), then
-issues `GET https://api.anthropic.com/api/oauth/usage` with header
+`claudeAiOauth.accessToken` (falling back to a top-level `accessToken`) plus
+the optional `claudeAiOauth.subscriptionType` and
+`claudeAiOauth.rateLimitTier` metadata, then issues
+`GET https://api.anthropic.com/api/oauth/usage` with header
 `anthropic-beta: oauth-2025-04-20`.
 
 - This is an **undocumented/internal endpoint** — it may change without
@@ -21,9 +23,9 @@ issues `GET https://api.anthropic.com/api/oauth/usage` with header
   code bug.
 - The token is read fresh on every fetch and kept in memory only; it is never
   written to the on-disk usage cache (see `PRIVACY.md`).
-- `planFromPayload()` tries 14 different JSON paths (`plan`, `plan_type`,
-  `subscription.tier`, `organization.plan`, ...) because the actual field
-  location in the response is not documented and may vary by account type.
+- The displayed plan derives only from credential metadata:
+  `subscriptionType (rateLimitTier)` when both are present, or the available
+  value alone. The usage payload does not provide plan information.
 - On non-200 responses, a `Retry-After` header (if present) is converted to
   `retryAfterMs` and honored by the controller's backoff (see
   [architecture.md](architecture.md#failure-handling-and-backoff)).

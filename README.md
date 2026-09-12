@@ -15,8 +15,9 @@ One compact entry per available agent—visible where you already work.
 
 - **Usage at a glance.** See the primary `5h` window and an optional weekly or
   billing-cycle window, with clear status indicators.
-- **Details when you need them.** Hover an entry for reset times, plan details,
-  credits, rate-limit information, and the last update time.
+- **Details when you need them.** Hover an entry for reset times, plan details
+  (including Claude subscription and rate-limit tier when available), credits,
+  rate-limit information, and the last update time.
 - **A sidebar view.** The **AI Usage** activity-bar panel mirrors the hover
   details with proportional usage bars and a refresh button.
 - **Useful defaults, flexible display.** Keep each agent's native used/remaining
@@ -30,7 +31,7 @@ Hover either status-bar entry for the active usage windows and account details.
 
 ![Codex usage hover popup with primary and weekly gauges, reset times, plan, and credits](assets/screenshots/tooltip-codex.png)
 
-![Claude Code usage hover popup with 5-hour and weekly gauges and reset times](assets/screenshots/tooltip-claude-code.png)
+![Claude Code usage hover popup with plan, 5-hour and weekly gauges, and reset times](assets/screenshots/tooltip-claude-code.png)
 
 ## Install in VS Code
 
@@ -130,7 +131,8 @@ AI Status Bar is intentionally read-only from the agents' point of view.
 - **Stays local:** Codex usage is requested from a local `codex app-server`
   process; normalized usage snapshots are cached in VS Code extension storage.
 - **Never persists:** Claude OAuth tokens and raw credential-file contents are not
-  written to the extension cache.
+  written to the extension cache. A normalized Claude plan label may be cached with
+  the usage snapshot.
 
 See [PRIVACY.md](PRIVACY.md) for the complete technical data-flow, security-boundary,
 and scope details.

@@ -10,8 +10,9 @@ in VS Code. It has no telemetry, analytics, or advertising integrations.
 
 ```text
 Claude Code credentials file
-  → OAuth token kept in memory
-  → Anthropic OAuth usage endpoint
+  ├→ OAuth token kept in memory → Anthropic OAuth usage endpoint → usage response
+  └→ Subscription and rate-limit metadata normalized locally
+Usage response + normalized metadata
   → normalized usage snapshot in VS Code extension storage
 
 Codex executable
@@ -28,10 +29,12 @@ authentication and any service communication.
 ### Claude Code credentials
 
 For Claude Code, the extension reads `~/.claude/.credentials.json` and extracts
-`claudeAiOauth.accessToken`, falling back to a top-level `accessToken`. The token is
-read during availability detection and again before a fresh usage request. It is held
-only in local variables and request state, is not intentionally retained after those
-operations, and is never cached or persisted by the extension.
+`claudeAiOauth.accessToken`, falling back to a top-level `accessToken`. It also
+reads optional `claudeAiOauth.subscriptionType` and
+`claudeAiOauth.rateLimitTier` fields to display the Claude plan and rate-limit tier.
+The token is read during availability detection and again before a fresh usage request.
+It is held only in local variables and request state, is not intentionally retained
+after those operations, and is never cached or persisted by the extension.
 
 The extension does not write, replace, refresh, or cache Claude credentials.
 
@@ -65,7 +68,8 @@ Cache files are stored in VS Code extension storage at:
 Each cache entry contains a version, update timestamp, and normalized usage data:
 plan name, primary and secondary usage percentages and reset times, available credits,
 rate-limit state, and optional display labels. Cache entries do not contain OAuth
-tokens or raw credential-file contents.
+tokens or raw credential-file contents. A plan name derived from the Claude credential
+metadata may be present as normalized usage data.
 
 Fresh usage replaces the corresponding cache entry. The extension does not define a
 separate retention period for these local cache files.
@@ -82,8 +86,7 @@ https://api.anthropic.com/api/oauth/usage
 
 The request includes the Claude OAuth token as a Bearer authorization header and the
 required Anthropic OAuth beta header. The response is parsed in memory to derive the
-usage windows, reset times, plan, and optional extra-usage credits shown by the
-extension.
+usage windows, reset times, and optional extra-usage credits shown by the extension.
 
 This endpoint is internal and undocumented. Its behavior or response format may
 change without notice.

@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as https from 'https';
 import * as os from 'os';
 import * as path from 'path';
+import { parseClaudeCredentials } from './claudeCredentials';
 import { getBool } from '../shared/settings';
 import { AgentDetection, AgentProvider, AgentUsage } from '../shared/types';
 
@@ -34,19 +35,19 @@ export class ClaudeProvider implements AgentProvider {
   }
 
   async detect(): Promise<AgentDetection> {
-    const token = await readAccessToken();
-    return token
+    const credentials = await readClaudeCredentials();
+    return credentials?.accessToken
       ? { available: true }
       : { available: false, reason: 'no Claude credentials found' };
   }
 
   async fetchUsage(): Promise<AgentUsage> {
-    const token = await readAccessToken();
-    if (!token) throw new Error('no credentials; sign in to Claude Code');
+    const credentials = await readClaudeCredentials();
+    if (!credentials?.accessToken) throw new Error('no credentials; sign in to Claude Code');
 
-    const payload = await fetchClaudeUsage(token);
+    const payload = await fetchClaudeUsage(credentials.accessToken);
     return {
-      plan: planFromPayload(payload),
+      plan: credentials.plan,
       fiveHour: payload.five_hour?.utilization === undefined
         ? undefined
         : {
@@ -64,11 +65,10 @@ export class ClaudeProvider implements AgentProvider {
   }
 }
 
-async function readAccessToken(): Promise<string | undefined> {
+async function readClaudeCredentials(): Promise<ReturnType<typeof parseClaudeCredentials>> {
   try {
     const raw = await fs.promises.readFile(path.join(os.homedir(), '.claude', '.credentials.json'), 'utf8');
-    const credentials = JSON.parse(raw);
-    return credentials?.claudeAiOauth?.accessToken ?? credentials?.accessToken;
+    return parseClaudeCredentials(raw);
   } catch {
     return undefined;
   }
@@ -126,39 +126,4 @@ function toCredits(payload: ClaudeUsagePayload): AgentUsage['credits'] {
     currency: extra.currency ?? 'USD',
     decimals: extra.decimal_places ?? 2,
   };
-}
-
-function readStringPath(value: unknown, keys: string[]): string | undefined {
-  let current: unknown = value;
-  for (const key of keys) {
-    if (current === null || typeof current !== 'object') return undefined;
-    current = (current as Record<string, unknown>)[key];
-  }
-  return typeof current === 'string' && current.trim() ? current.trim() : undefined;
-}
-
-function planFromPayload(payload: unknown): string | undefined {
-  const paths = [
-    ['plan'],
-    ['plan_type'],
-    ['planType'],
-    ['tier'],
-    ['subscription', 'plan'],
-    ['subscription', 'plan_type'],
-    ['subscription', 'planType'],
-    ['subscription', 'tier'],
-    ['account', 'plan'],
-    ['account', 'plan_type'],
-    ['account', 'subscription', 'plan'],
-    ['organization', 'plan'],
-    ['organization', 'plan_type'],
-    ['organization', 'subscription', 'plan'],
-  ];
-
-  for (const candidate of paths) {
-    const plan = readStringPath(payload, candidate);
-    if (plan) return plan;
-  }
-
-  return undefined;
 }
