@@ -9,6 +9,8 @@ tmp/**
 versions/**
 docs/**
 scripts/**
+.agents/**
+.claude/**
 
 .vscodeignore
 .gitignore
