@@ -2,7 +2,6 @@
 
 ## Known debt (not fixed, out of scope for the bootstrap)
 
-- `CodexProvider.detect()`'s first branch (`resolved !== 'codex' || configured !== 'codex'`) is always true when reached — the "let fetchUsage make the final call" comment is dead code.
 - `typescript` is held at `^5.4.0` while 7.x is current. TypeScript 7 is the
   native-port rewrite with its own compatibility surface; upgrading is a
   deliberate change that needs its own gate run and `vsce package`

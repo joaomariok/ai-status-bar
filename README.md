@@ -61,7 +61,8 @@ available on your machine:
   `~/.claude/.credentials.json` file exists and contains valid credentials.
 - **Codex:** install and sign in to Codex. AI Status Bar checks known installation
   locations and `PATH`; for a custom installation, set `aiStatusBar.codex.command`
-  to the full executable path.
+  to the full executable path. Codex stays hidden until a safe executable is found.
+  On Windows, configure `codex.exe` directly; `.cmd` and `.bat` shims are rejected.
 
 Reload VS Code after installation. Look at the right side of the status bar; if
 both agents are detected, each gets its own entry. Open the **AI Usage** view in
@@ -120,7 +121,7 @@ All settings are under `aiStatusBar`.
 | `locale` | `""` | BCP-47 locale for reset times, for example `de-DE`. Empty uses the system locale. |
 | `claude.enabled` | `true` | Enable or disable Claude Code detection and display. |
 | `codex.enabled` | `true` | Enable or disable Codex detection and display. |
-| `codex.command` | `codex` | Codex executable path or command. This is machine-scoped for safety. |
+| `codex.command` | `codex` | Codex executable path or command. It must resolve to an executable; Windows `.cmd`/`.bat` shims are rejected. This is machine-scoped for safety. |
 
 ## Privacy and security
 

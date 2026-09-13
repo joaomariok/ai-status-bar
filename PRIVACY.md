@@ -43,7 +43,9 @@ The extension does not write, replace, refresh, or cache Claude credentials.
 For Codex, the extension reads its VS Code configuration to determine the
 machine-scoped `aiStatusBar.codex.command` setting. When that setting remains at its
 default, it checks known global-install and VS Code/Cursor extension locations before
-falling back to `codex` on `PATH`.
+searching `PATH` for a Codex executable. A custom command is resolved as an
+executable path or through `PATH`. If no safe executable resolves, Codex remains
+unavailable and the extension does not start a local process.
 
 The resolved executable is started locally as `codex app-server`. The extension
 communicates with it using line-delimited JSON-RPC over standard input and output,

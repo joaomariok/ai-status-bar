@@ -45,15 +45,19 @@ The child process is always killed on completion, timeout, or error
 (`taskkill /T /F` on Windows, `proc.kill()` elsewhere) and tracked in a
 `Set<ChildProcess>` disposed with the provider.
 
-**Command resolution** (`resolveCodexCommand`), only when
-`aiStatusBar.codex.command` is left at its default `codex`:
+**Command resolution** (`resolveCodexCommand`) locates a safe executable before
+Codex is marked available. With the default `codex` command, it checks:
 
 1. npm global install locations (`%APPDATA%\npm\...` on Windows,
    `~/.npm-global/bin`, `~/.local/bin`, Homebrew paths elsewhere).
 2. Bundled binaries inside `openai.chatgpt-*` VS Code/Cursor extension
    directories, per-platform (`bin/windows-x86_64/codex.exe`,
    `bin/macos-aarch64/codex`, etc.).
-3. Falls back to the bare `codex` and lets `PATH` resolve it.
+3. `PATH` entries for the Codex executable.
+
+A custom `aiStatusBar.codex.command` is resolved as either a direct executable
+path or a command found on `PATH`. If no safe executable resolves, Codex is
+unavailable and no `app-server` process starts.
 
 **`.cmd`/`.bat` shims are explicitly rejected on Windows** — `codex.command`
 must point directly at `codex.exe`, not a wrapper script, to avoid a future

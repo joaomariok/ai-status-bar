@@ -63,7 +63,9 @@ npm test
 [`usageStore.ts`](../src/shared/usageStore.ts),
 [`panelModel.ts`](../src/shared/panelModel.ts), and
 [`panelHtml.ts`](../src/shared/panelHtml.ts), and
-[`claudeCredentials.ts`](../src/agents/claudeCredentials.ts). Everything else
+[`claudeCredentials.ts`](../src/agents/claudeCredentials.ts),
+[`codexCommand.ts`](../src/agents/codexCommand.ts), and
+[`codexDetection.ts`](../src/agents/codexDetection.ts). Everything else
 (`renderer.ts`, `settings.ts`, `statusController.ts`, `usageViewProvider.ts`,
 and the remaining agent providers) imports `vscode`, which only resolves inside
 a real or mocked extension host. If you need to test logic in one of those

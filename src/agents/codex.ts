@@ -2,6 +2,12 @@ import { ChildProcess, execFile, spawn } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as readline from 'readline';
+import {
+  exists,
+  findCommandOnPath,
+  isWindowsCommandShim,
+} from './codexCommand';
+import { detectCodexAvailability } from './codexDetection';
 import { getBool, getString } from '../shared/settings';
 import { AgentDetection, AgentProvider, AgentUsage } from '../shared/types';
 import { getExtensionVersion } from '../shared/version';
@@ -66,17 +72,14 @@ export class CodexProvider implements AgentProvider {
   async detect(): Promise<AgentDetection> {
     const configured = getString('codex.command', 'codex');
     const resolved = await resolveCodexCommand(configured);
-    if (resolved !== 'codex' || configured !== 'codex')
-      return { available: true };
-
-    // The executable may still be on PATH. Let fetchUsage make the final call.
-    return { available: true };
+    return detectCodexAvailability(resolved);
   }
 
   async fetchUsage(): Promise<AgentUsage> {
     const command = await resolveCodexCommand(
       getString('codex.command', 'codex'),
     );
+    if (!command) throw new Error('Codex executable not found');
     const usage = await fetchCodexRateLimits(command, this.activeProcesses);
 
     return {
@@ -99,20 +102,6 @@ export class CodexProvider implements AgentProvider {
   }
 }
 
-async function exists(file: string): Promise<boolean> {
-  try {
-    await fs.promises.access(file, fs.constants.X_OK);
-    return true;
-  } catch {
-    try {
-      await fs.promises.access(file, fs.constants.F_OK);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-}
-
 async function findFirstMatchingCodex(
   root: string | undefined,
   relativeParts: string[],
@@ -132,9 +121,14 @@ async function findFirstMatchingCodex(
   return undefined;
 }
 
-async function resolveCodexCommand(configured: string): Promise<string> {
+async function resolveCodexCommand(
+  configured: string,
+): Promise<string | undefined> {
   if (configured && configured !== 'codex') {
-    return configured;
+    if (isPathCommand(configured)) {
+      return (await exists(configured)) ? configured : undefined;
+    }
+    return findCommandOnPath(configured);
   }
 
   const candidates = await codexCommandCandidates();
@@ -146,7 +140,13 @@ async function resolveCodexCommand(configured: string): Promise<string> {
     }
   }
 
-  return 'codex';
+  return findCommandOnPath('codex');
+}
+
+function isPathCommand(command: string): boolean {
+  return (
+    path.isAbsolute(command) || command.includes('/') || command.includes('\\')
+  );
 }
 
 async function codexCommandCandidates(): Promise<string[]> {
@@ -400,10 +400,6 @@ function killTree(proc: ChildProcess): void {
     return;
   }
   proc.kill();
-}
-
-function isWindowsCommandShim(command: string): boolean {
-  return process.platform === 'win32' && /\.(cmd|bat)$/i.test(command);
 }
 
 function stderrSuffix(stderr: string): string {
