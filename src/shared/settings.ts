@@ -1,5 +1,10 @@
 import * as vscode from 'vscode';
-import { AgentNameStyle, AgentSettings, StatusBarStyle } from './types';
+import {
+  AgentNameStyle,
+  AgentSettings,
+  ResetTimeFormat,
+  StatusBarStyle,
+} from './types';
 import { CAUTION_AT, WARN_AT } from './format';
 
 const CONFIG_SECTION = 'aiStatusBar';
@@ -25,6 +30,7 @@ export function getSettings(): AgentSettings {
       'agentDefault',
     statusBarStyle: cfg.get<StatusBarStyle>('statusBarStyle') ?? 'full',
     agentNameStyle: cfg.get<AgentNameStyle>('agentNameStyle') ?? 'both',
+    resetTimeFormat: cfg.get<ResetTimeFormat>('resetTimeFormat') ?? 'absolute',
   };
 }
 

@@ -156,7 +156,9 @@ function buildWindowRow(
       settings.cautionAt,
       settings.warnAt,
     ),
-    resetText: formatReset(win?.resetsAt, settings.locale, withDate),
+    resetText: formatReset(win?.resetsAt, settings.locale, withDate, {
+      format: settings.resetTimeFormat,
+    }),
   };
 }
 

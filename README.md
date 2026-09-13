@@ -119,6 +119,7 @@ All settings are under `aiStatusBar`.
 | `cautionAt` | `70` | Used percentage where the status indicator turns yellow. |
 | `warnAt` | `90` | Used percentage where the status indicator turns red and warning notifications can appear. |
 | `locale` | `""` | BCP-47 locale for reset times, for example `de-DE`. Empty uses the system locale. |
+| `resetTimeFormat` | `absolute` | `absolute` (clock time or date), `relative` (countdown, for example `in 2h 15m`), or `both`. `locale` only affects the absolute part. |
 | `claude.enabled` | `true` | Enable or disable Claude Code detection and display. |
 | `codex.enabled` | `true` | Enable or disable Codex detection and display. |
 | `codex.command` | `codex` | Codex executable path or command. It must resolve to an executable; Windows `.cmd`/`.bat` shims are rejected. This is machine-scoped for safety. |

@@ -2,6 +2,7 @@ export type PresentationMode = 'used' | 'remaining';
 export type ConfiguredPresentationMode = PresentationMode | 'agentDefault';
 export type StatusBarStyle = 'full' | 'compact';
 export type AgentNameStyle = 'text' | 'icon' | 'both';
+export type ResetTimeFormat = 'absolute' | 'relative' | 'both';
 
 export interface AgentDetection {
   available: boolean;
@@ -77,4 +78,5 @@ export interface AgentSettings {
   presentationMode: ConfiguredPresentationMode;
   statusBarStyle: StatusBarStyle;
   agentNameStyle: AgentNameStyle;
+  resetTimeFormat: ResetTimeFormat;
 }

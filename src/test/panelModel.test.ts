@@ -15,6 +15,7 @@ function settings(overrides: Partial<AgentSettings> = {}): AgentSettings {
     presentationMode: 'agentDefault',
     statusBarStyle: 'full',
     agentNameStyle: 'both',
+    resetTimeFormat: 'absolute',
     ...overrides,
   };
 }
@@ -150,6 +151,15 @@ test('window labels and reset-with-date overrides from the provider are honored'
   assert.equal(model.agents[0].windows[0].label, 'Daily');
   assert.equal(model.agents[0].windows[1].label, 'Monthly');
   assert.match(model.agents[0].windows[0].resetText, /Mar/);
+});
+
+test('resetTimeFormat setting controls how resetText is rendered', () => {
+  const resetsAt = new Date(Date.now() + 45 * 60_000).toISOString();
+  const model = buildPanelModel(
+    [snapshot({ usage: { fiveHour: { usedPercent: 10, resetsAt } } })],
+    settings({ resetTimeFormat: 'relative' }),
+  );
+  assert.equal(model.agents[0].windows[0].resetText, 'in 45m');
 });
 
 test('limitReached is surfaced from usage', () => {

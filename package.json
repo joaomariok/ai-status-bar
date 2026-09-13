@@ -183,6 +183,21 @@
             "type": "string",
             "default": "",
             "description": "BCP-47 locale for dates/times, for example de-DE. Empty means system locale."
+          },
+          "aiStatusBar.resetTimeFormat": {
+            "type": "string",
+            "default": "absolute",
+            "enum": [
+              "absolute",
+              "relative",
+              "both"
+            ],
+            "enumDescriptions": [
+              "Show reset times as a clock time or date, for example 14:30.",
+              "Show reset times as a countdown, for example \"in 2h 15m\".",
+              "Show both the countdown and the clock time or date."
+            ],
+            "description": "How reset times are displayed in the hover tooltip and sidebar panel. The locale setting only affects the absolute part."
           }
         }
       },

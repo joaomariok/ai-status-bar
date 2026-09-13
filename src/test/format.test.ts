@@ -6,6 +6,7 @@ import {
   dot,
   escapeHtml,
   escapeMarkdown,
+  formatRelativeReset,
   formatReset,
   meter,
   money,
@@ -88,6 +89,65 @@ test('formatReset treats a numeric value as epoch seconds, not milliseconds', ()
 test('formatReset formats an ISO string with the date flag', () => {
   const result = formatReset('2024-03-15T10:00:00.000Z', 'en-US', true);
   assert.match(result, /Mar/);
+});
+
+test('formatRelativeReset buckets a duration into compact units', () => {
+  assert.equal(formatRelativeReset(0), 'now');
+  assert.equal(formatRelativeReset(-1000), 'now');
+  assert.equal(formatRelativeReset(30_000), 'in <1m');
+  assert.equal(formatRelativeReset(45 * 60_000), 'in 45m');
+  assert.equal(formatRelativeReset(60 * 60_000), 'in 1h');
+  assert.equal(formatRelativeReset(2 * 60 * 60_000 + 15 * 60_000), 'in 2h 15m');
+  assert.equal(formatRelativeReset(24 * 60 * 60_000), 'in 1d');
+  assert.equal(
+    formatRelativeReset(4 * 24 * 60 * 60_000 + 6 * 60 * 60_000),
+    'in 4d 6h',
+  );
+});
+
+test('formatReset with format "relative" ignores the withDate flag and uses the injected clock', () => {
+  const now = Date.parse('2024-03-15T10:00:00.000Z');
+  const resetsAt = now + 2 * 60 * 60_000 + 15 * 60_000; // +2h15m
+  assert.equal(
+    formatReset(resetsAt / 1000, 'en-US', false, { format: 'relative', now }),
+    'in 2h 15m',
+  );
+  assert.equal(
+    formatReset(resetsAt / 1000, 'en-US', true, { format: 'relative', now }),
+    'in 2h 15m',
+  );
+});
+
+test('formatReset with format "both" appends the absolute value in parentheses', () => {
+  const now = Date.parse('2024-03-15T10:00:00.000Z');
+  const resetsAt = now + 45 * 60_000; // +45m
+  const result = formatReset(resetsAt / 1000, 'en-US', false, {
+    format: 'both',
+    now,
+  });
+  assert.match(result, /^in 45m \(\d{1,2}:\d{2}\s?(AM|PM)\)$/i);
+});
+
+test('formatReset with format "both" and withDate uses the date form in parentheses', () => {
+  const now = Date.parse('2024-03-15T10:00:00.000Z');
+  const resetsAt = now + 4 * 24 * 60 * 60_000; // +4d
+  const result = formatReset(resetsAt / 1000, 'en-US', true, {
+    format: 'both',
+    now,
+  });
+  assert.match(result, /^in 4d \([A-Za-z]{3}\s+\d{1,2}\)$/);
+});
+
+test('formatReset returns empty string for invalid input regardless of format', () => {
+  assert.equal(
+    formatReset(undefined, undefined, false, { format: 'relative' }),
+    '',
+  );
+  assert.equal(formatReset(null, undefined, false, { format: 'both' }), '');
+  assert.equal(
+    formatReset('not-a-date', undefined, false, { format: 'relative' }),
+    '',
+  );
 });
 
 test('money converts minor units using the given decimals and known currency symbols', () => {

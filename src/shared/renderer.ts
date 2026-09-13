@@ -192,7 +192,9 @@ function appendWindowRow(
   const used = win?.usedPercent;
   const display = presentationPercent(used, mode);
   const gauge = `${meter(display, 12, '█', '░')}`;
-  const reset = formatReset(win?.resetsAt, settings.locale, withDate);
+  const reset = formatReset(win?.resetsAt, settings.locale, withDate, {
+    format: settings.resetTimeFormat,
+  });
 
   md.appendMarkdown(
     `| &nbsp;${dot(used, settings.cautionAt, settings.warnAt)}&nbsp; ${label}&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;${pctShort(display)}&nbsp;&nbsp;&nbsp;&nbsp;${gauge}&nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp;${reset || '&mdash;'}&nbsp;&nbsp; |\n`,
