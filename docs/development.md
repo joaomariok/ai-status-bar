@@ -64,6 +64,7 @@ npm test
 [`panelModel.ts`](../src/shared/panelModel.ts), and
 [`panelHtml.ts`](../src/shared/panelHtml.ts), and
 [`claudeCredentials.ts`](../src/agents/claudeCredentials.ts),
+[`claudeUsage.ts`](../src/agents/claudeUsage.ts),
 [`codexCommand.ts`](../src/agents/codexCommand.ts), and
 [`codexDetection.ts`](../src/agents/codexDetection.ts). Everything else
 (`renderer.ts`, `settings.ts`, `statusController.ts`, `usageViewProvider.ts`,

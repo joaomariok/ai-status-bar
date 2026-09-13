@@ -3,25 +3,13 @@ import * as https from 'https';
 import * as os from 'os';
 import * as path from 'path';
 import { parseClaudeCredentials } from './claudeCredentials';
+import { ClaudeUsagePayload, normalizeClaudeUsage } from './claudeUsage';
 import { getBool } from '../shared/settings';
 import { AgentDetection, AgentProvider, AgentUsage } from '../shared/types';
 
 const USAGE_URL = 'https://api.anthropic.com/api/oauth/usage';
 const OAUTH_BETA = 'oauth-2025-04-20';
 const MAX_RETRY_AFTER_MS = 30 * 60_000;
-
-interface ClaudeUsagePayload {
-  five_hour?: { utilization?: number; resets_at?: string };
-  seven_day?: { utilization?: number; resets_at?: string };
-  extra_usage?: {
-    is_enabled?: boolean;
-    utilization?: number;
-    used_credits?: number;
-    monthly_limit?: number;
-    currency?: string;
-    decimal_places?: number;
-  };
-}
 
 export class ClaudeProvider implements AgentProvider {
   readonly id = 'claude';
@@ -47,24 +35,7 @@ export class ClaudeProvider implements AgentProvider {
       throw new Error('no credentials; sign in to Claude Code');
 
     const payload = await fetchClaudeUsage(credentials.accessToken);
-    return {
-      plan: credentials.plan,
-      fiveHour:
-        payload.five_hour?.utilization === undefined
-          ? undefined
-          : {
-              usedPercent: payload.five_hour.utilization,
-              resetsAt: payload.five_hour.resets_at,
-            },
-      weekly:
-        payload.seven_day?.utilization === undefined
-          ? undefined
-          : {
-              usedPercent: payload.seven_day.utilization,
-              resetsAt: payload.seven_day.resets_at,
-            },
-      credits: toCredits(payload),
-    };
+    return normalizeClaudeUsage(payload, credentials.plan);
   }
 }
 
@@ -129,17 +100,4 @@ function fetchClaudeUsage(token: string): Promise<ClaudeUsagePayload> {
     req.on('timeout', () => req.destroy(new Error('timeout')));
     req.on('error', reject);
   });
-}
-
-function toCredits(payload: ClaudeUsagePayload): AgentUsage['credits'] {
-  const extra = payload.extra_usage;
-  if (!extra?.is_enabled || extra.monthly_limit === undefined) return undefined;
-
-  return {
-    usedPercent: extra.utilization ?? 0,
-    used: extra.used_credits ?? 0,
-    limit: extra.monthly_limit,
-    currency: extra.currency ?? 'USD',
-    decimals: extra.decimal_places ?? 2,
-  };
 }
