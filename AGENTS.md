@@ -35,3 +35,6 @@ Typecheck → tests → packaging dry-run. See
   reformatting or restructuring files you don't need to touch.
 - No new dependencies without a compelling reason — the extension currently
   has zero runtime dependencies.
+- After every implementation, review relevant documentation and update it when
+  needed. Delete stale, irrelevant, or untrue information instead of amending
+  it, and do not document details readily inferable from the code.
