@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.2 - 2026-09-14
+
+- Added `aiStatusBar.resetTimeFormat` to show reset times as a clock time, a countdown, or both.
+- Added the Claude credential plan and tier to the Claude tooltip.
+- Changed the default weekly window label from `wk` to `7d`.
+- Fixed Codex availability detection — a missing executable, or a `.cmd`/`.bat` shim in `codex.command`, now reports a clear reason instead of failing silently.
+- Added ESLint and Prettier with `lint` and `format` scripts.
+- Refreshed the README, privacy reference, and repository docs.
+
 ## 1.1.1 - 2026-09-12
 
 - Fixed release-notes extraction to parse changelog headings without regex.
