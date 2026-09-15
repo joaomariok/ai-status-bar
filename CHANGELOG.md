@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.3 - 2026-09-15
+
+- Added agent credit usage to the status bar when standard usage limits are exhausted.
+
 ## 1.1.2 - 2026-09-14
 
 - Added `aiStatusBar.resetTimeFormat` to show reset times as a clock time, a countdown, or both.
