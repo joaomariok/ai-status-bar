@@ -23,12 +23,28 @@ export interface CreditUsage {
   usedPercent?: number;
 }
 
+export type StatusBarFallback =
+  | {
+      kind: 'gauge';
+      label: string;
+      usedPercent: number;
+      severityOverride?: 'warn';
+    }
+  | {
+      kind: 'text';
+      label: string;
+      text: string;
+      severityOverride?: 'warn';
+    }
+  | { kind: 'labelOnly' };
+
 export interface AgentUsage {
   plan?: string;
   fiveHour?: UsageWindow;
   weekly?: UsageWindow;
   credits?: CreditUsage;
   limitReached?: boolean;
+  statusBarFallback?: StatusBarFallback;
   windowLabels?: AgentProvider['windowLabels'];
 }
 

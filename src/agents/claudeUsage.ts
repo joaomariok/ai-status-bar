@@ -1,4 +1,4 @@
-import { AgentUsage } from '../shared/types';
+import { AgentUsage, StatusBarFallback, UsageWindow } from '../shared/types';
 
 export interface ClaudeUsagePayload {
   five_hour?: { utilization?: number; resets_at?: string };
@@ -17,24 +17,61 @@ export function normalizeClaudeUsage(
   payload: ClaudeUsagePayload,
   plan: string | undefined,
 ): AgentUsage {
+  const fiveHour = toUsageWindow(payload.five_hour);
+  const weekly = toUsageWindow(payload.seven_day);
+  const credits = toCredits(payload);
+  const statusBarFallback = claudeStatusBarFallback(fiveHour, weekly, credits);
+
   return {
     plan,
-    fiveHour:
-      payload.five_hour?.utilization === undefined
-        ? undefined
-        : {
-            usedPercent: payload.five_hour.utilization,
-            resetsAt: payload.five_hour.resets_at,
-          },
-    weekly:
-      payload.seven_day?.utilization === undefined
-        ? undefined
-        : {
-            usedPercent: payload.seven_day.utilization,
-            resetsAt: payload.seven_day.resets_at,
-          },
-    credits: toCredits(payload),
+    fiveHour,
+    weekly,
+    credits,
+    ...(statusBarFallback ? { statusBarFallback } : {}),
   };
+}
+
+function toUsageWindow(
+  window: ClaudeUsagePayload['five_hour'],
+): UsageWindow | undefined {
+  if (window?.utilization === undefined) return undefined;
+  return {
+    usedPercent: window.utilization,
+    resetsAt: window.resets_at,
+  };
+}
+
+function claudeStatusBarFallback(
+  fiveHour: UsageWindow | undefined,
+  weekly: UsageWindow | undefined,
+  credits: AgentUsage['credits'],
+): StatusBarFallback | undefined {
+  const usedPercent = finiteCreditPercent(credits?.usedPercent);
+  const hasWindows = Boolean(fiveHour || weekly);
+  const exhausted = isWindowExhausted(fiveHour) || isWindowExhausted(weekly);
+
+  if (!hasWindows && usedPercent === undefined) {
+    return { kind: 'labelOnly' };
+  }
+  if (usedPercent === undefined || (!exhausted && hasWindows)) {
+    return undefined;
+  }
+  return {
+    kind: 'gauge',
+    label: 'Cr',
+    usedPercent,
+    ...(exhausted ? { severityOverride: 'warn' as const } : {}),
+  };
+}
+
+function finiteCreditPercent(value: number | undefined): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value)
+    ? value
+    : undefined;
+}
+
+function isWindowExhausted(window: UsageWindow | undefined): boolean {
+  return window?.usedPercent !== undefined && window.usedPercent >= 100;
 }
 
 function toCredits(payload: ClaudeUsagePayload): AgentUsage['credits'] {

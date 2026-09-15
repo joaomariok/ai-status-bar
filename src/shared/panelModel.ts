@@ -64,15 +64,17 @@ export interface PanelModel {
 export function buildPanelModel(
   snapshots: AgentSnapshot[],
   settings: AgentSettings,
+  now = Date.now(),
 ): PanelModel {
   return {
-    agents: snapshots.map((snapshot) => buildEntry(snapshot, settings)),
+    agents: snapshots.map((snapshot) => buildEntry(snapshot, settings, now)),
   };
 }
 
 function buildEntry(
   snapshot: AgentSnapshot,
   settings: AgentSettings,
+  now: number,
 ): AgentPanelEntry {
   const base = {
     providerId: snapshot.providerId,
@@ -116,6 +118,7 @@ function buildEntry(
         windowLabels?.fiveHourResetWithDate ?? false,
         mode,
         settings,
+        now,
       ),
       buildWindowRow(
         windowLabels?.weeklyTooltip ?? 'Weekly',
@@ -123,6 +126,7 @@ function buildEntry(
         windowLabels?.weeklyResetWithDate ?? true,
         mode,
         settings,
+        now,
       ),
     ],
     credits: buildCredits(usage, mode, settings),
@@ -145,6 +149,7 @@ function buildWindowRow(
   withDate: boolean,
   mode: PresentationMode,
   settings: AgentSettings,
+  now: number,
 ): PanelWindowRow {
   const display = presentationPercent(win?.usedPercent, mode);
   return {
@@ -158,6 +163,7 @@ function buildWindowRow(
     ),
     resetText: formatReset(win?.resetsAt, settings.locale, withDate, {
       format: settings.resetTimeFormat,
+      now,
     }),
   };
 }

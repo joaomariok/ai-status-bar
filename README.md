@@ -14,7 +14,11 @@ One compact entry per available agent—visible where you already work.
 ## What you get
 
 - **Usage at a glance.** See the primary `5h` window and an optional weekly or
-  billing-cycle window, with clear status indicators.
+  billing-cycle window, with clear status indicators. When Claude has only
+  extra-usage credits available (including credit-only Enterprise plans), its
+  status-bar entry shows a `Cr` gauge instead; a red dot marks that an
+  exhausted Claude window has switched usage to paid credits. Codex shows its
+  `Cr:` balance when a limit is reached or credit-only usage is reported.
 - **Details when you need them.** Hover an entry for reset times, plan details
   (including Claude subscription and rate-limit tier when available), credits,
   rate-limit information, and the last update time.

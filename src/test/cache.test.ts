@@ -4,6 +4,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { after, afterEach, before, test } from 'node:test';
 import { readCache, writeCache } from '../shared/cache';
+import { AgentUsage } from '../shared/types';
 
 interface Sample {
   greeting: string;
@@ -38,6 +39,24 @@ test('writeCache then readCache round-trips the value and stamp', async () => {
   assert.ok(result);
   assert.equal(result?.stamp, 1234);
   assert.deepEqual(result?.value, { greeting: 'hi' });
+});
+
+test('writeCache then readCache round-trips an AgentUsage fallback descriptor', async () => {
+  const file = path.join(dir, 'usage-fallback.json');
+  const usage: AgentUsage = {
+    fiveHour: { usedPercent: 100 },
+    statusBarFallback: {
+      kind: 'gauge',
+      label: 'Credits',
+      usedPercent: 35,
+      severityOverride: 'warn',
+    },
+  };
+
+  await writeCache<AgentUsage>(file, { stamp: 1234, value: usage });
+
+  const result = await readCache<AgentUsage>(file);
+  assert.deepEqual(result?.value, usage);
 });
 
 test('writeCache creates missing parent directories', async () => {

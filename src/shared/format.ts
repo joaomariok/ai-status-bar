@@ -62,7 +62,11 @@ export function dot(
   caution = CAUTION_AT,
   warn = WARN_AT,
 ): string {
-  switch (severity(used, caution, warn)) {
+  return dotForSeverity(severity(used, caution, warn));
+}
+
+function dotForSeverity(level: Severity): string {
+  switch (level) {
     case 'none':
       return '○';
     case 'warn':
@@ -130,14 +134,28 @@ export function statusPart(
     cells: number;
     cautionAt: number;
     warnAt: number;
+    severityOverride?: Severity;
   },
 ): string {
   const display = presentationPercent(used, opts.mode);
-  const dotGlyph = dot(used, opts.cautionAt, opts.warnAt);
+  const dotGlyph = opts.severityOverride
+    ? dotForSeverity(opts.severityOverride)
+    : dot(used, opts.cautionAt, opts.warnAt);
 
   return opts.style === 'compact'
     ? `${dotGlyph} ${label}: ${pctShort(display)}`
     : `${dotGlyph} ${label} ${meter(display, opts.cells)} ${pctShort(display)}`;
+}
+
+export function statusTextPart(
+  label: string,
+  text: string,
+  opts: { severityOverride?: Severity } = {},
+): string {
+  const dotGlyph = opts.severityOverride
+    ? dotForSeverity(opts.severityOverride)
+    : dotForSeverity('none');
+  return `${dotGlyph} ${label}: ${text}`;
 }
 
 export function agentPrefix(

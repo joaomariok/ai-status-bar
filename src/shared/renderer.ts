@@ -8,7 +8,6 @@ import {
   money,
   pctShort,
   presentationPercent,
-  statusPart,
 } from './format';
 import {
   AgentProvider,
@@ -17,7 +16,7 @@ import {
   PresentationMode,
   UsageWindow,
 } from './types';
-import { resolveWindowLabel } from './windowLabels';
+import { buildStatusBarParts } from './statusBarParts';
 
 export interface RenderInput {
   provider: AgentProvider;
@@ -53,40 +52,12 @@ export function renderStatus(input: RenderInput): {
 
   const mode = resolvePresentationMode(provider, settings);
   const windowLabels = usage.windowLabels ?? provider.windowLabels;
-  const parts: string[] = [];
-  const replacePrimaryWithWeekly =
-    settings.replacePrimaryWithWeeklyOnLimit &&
-    isWindowLimitReached(usage.weekly);
-
-  if (replacePrimaryWithWeekly) {
-    parts.push(
-      renderBarPart(
-        resolveWindowLabel(windowLabels, 'weekly'),
-        usage.weekly,
-        mode,
-        settings,
-      ),
-    );
-  } else {
-    parts.push(
-      renderBarPart(
-        resolveWindowLabel(windowLabels, 'fiveHour'),
-        usage.fiveHour,
-        mode,
-        settings,
-      ),
-    );
-    if (settings.showWeekly) {
-      parts.push(
-        renderBarPart(
-          resolveWindowLabel(windowLabels, 'weekly'),
-          usage.weekly,
-          mode,
-          settings,
-        ),
-      );
-    }
-  }
+  const parts = buildStatusBarParts({
+    usage,
+    mode,
+    settings,
+    windowLabels,
+  });
 
   const prefix = agentPrefix(
     provider.label,
@@ -101,25 +72,6 @@ export function renderStatus(input: RenderInput): {
     text,
     tooltip: renderTooltip(input, mode),
   };
-}
-
-function isWindowLimitReached(win: UsageWindow | undefined): boolean {
-  return win?.usedPercent !== undefined && win.usedPercent >= 100;
-}
-
-function renderBarPart(
-  label: string,
-  win: UsageWindow | undefined,
-  mode: PresentationMode,
-  settings: AgentSettings,
-): string {
-  return statusPart(label, win?.usedPercent, {
-    style: settings.statusBarStyle,
-    mode,
-    cells: settings.cells,
-    cautionAt: settings.cautionAt,
-    warnAt: settings.warnAt,
-  });
 }
 
 function renderTooltip(

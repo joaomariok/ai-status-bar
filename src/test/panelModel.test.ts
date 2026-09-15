@@ -153,11 +153,13 @@ test('window labels and reset-with-date overrides from the provider are honored'
   assert.match(model.agents[0].windows[0].resetText, /Mar/);
 });
 
-test('resetTimeFormat setting controls how resetText is rendered', () => {
-  const resetsAt = new Date(Date.now() + 45 * 60_000).toISOString();
+test('resetTimeFormat uses an injected clock for relative reset text', () => {
+  const now = Date.parse('2030-01-01T10:00:00.000Z');
+  const resetsAt = new Date(now + 45 * 60_000).toISOString();
   const model = buildPanelModel(
     [snapshot({ usage: { fiveHour: { usedPercent: 10, resetsAt } } })],
     settings({ resetTimeFormat: 'relative' }),
+    now,
   );
   assert.equal(model.agents[0].windows[0].resetText, 'in 45m');
 });

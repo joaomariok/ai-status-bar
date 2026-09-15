@@ -8,6 +8,7 @@ import {
   isWindowsCommandShim,
 } from './codexCommand';
 import { detectCodexAvailability } from './codexDetection';
+import { CodexRateLimitSnapshot, normalizeCodexUsage } from './codexUsage';
 import { getBool, getString } from '../shared/settings';
 import { AgentDetection, AgentProvider, AgentUsage } from '../shared/types';
 import { getExtensionVersion } from '../shared/version';
@@ -15,31 +16,12 @@ import { getExtensionVersion } from '../shared/version';
 const START_TIMEOUT_MS = 15_000;
 const REQUEST_TIMEOUT_MS = 30_000;
 
-interface RateLimitWindow {
-  usedPercent: number;
-  windowDurationMins: number | null;
-  resetsAt: number | null;
-}
-
-interface CreditsSnapshot {
-  hasCredits: boolean;
-  unlimited: boolean;
-  balance: string | null;
-}
-
-interface RateLimitSnapshot {
-  limitId: string | null;
-  limitName: string | null;
-  primary: RateLimitWindow | null;
-  secondary: RateLimitWindow | null;
-  credits: CreditsSnapshot | null;
-  planType: string | null;
-  rateLimitReachedType: string | null;
-}
-
 interface RateLimitsResponse {
-  rateLimits: RateLimitSnapshot;
-  rateLimitsByLimitId: Record<string, RateLimitSnapshot | undefined> | null;
+  rateLimits: CodexRateLimitSnapshot;
+  rateLimitsByLimitId: Record<
+    string,
+    CodexRateLimitSnapshot | undefined
+  > | null;
 }
 
 interface AppServerResponse {
@@ -81,24 +63,7 @@ export class CodexProvider implements AgentProvider {
     );
     if (!command) throw new Error('Codex executable not found');
     const usage = await fetchCodexRateLimits(command, this.activeProcesses);
-
-    return {
-      plan: usage.planType ?? undefined,
-      fiveHour: usage.primary
-        ? {
-            usedPercent: usage.primary.usedPercent,
-            resetsAt: usage.primary.resetsAt,
-          }
-        : undefined,
-      weekly: usage.secondary
-        ? {
-            usedPercent: usage.secondary.usedPercent,
-            resetsAt: usage.secondary.resetsAt,
-          }
-        : undefined,
-      credits: usage.credits ? { text: creditText(usage.credits) } : undefined,
-      limitReached: Boolean(usage.rateLimitReachedType),
-    };
+    return normalizeCodexUsage(usage);
   }
 }
 
@@ -276,7 +241,7 @@ function homeDir(): string {
 function fetchCodexRateLimits(
   command: string,
   activeProcesses: Set<ChildProcess>,
-): Promise<RateLimitSnapshot> {
+): Promise<CodexRateLimitSnapshot> {
   return new Promise((resolve, reject) => {
     if (isWindowsCommandShim(command)) {
       reject(
@@ -301,7 +266,7 @@ function fetchCodexRateLimits(
 
     const finish = (
       error: Error | undefined,
-      value?: RateLimitSnapshot,
+      value?: CodexRateLimitSnapshot,
     ): void => {
       if (settled) return;
       settled = true;
@@ -405,10 +370,4 @@ function killTree(proc: ChildProcess): void {
 function stderrSuffix(stderr: string): string {
   const trimmed = stderr.trim();
   return trimmed ? `; stderr: ${trimmed.slice(-300)}` : '';
-}
-
-function creditText(credits: CreditsSnapshot): string {
-  if (credits.unlimited) return 'unlimited';
-  if (credits.hasCredits) return credits.balance ?? 'available';
-  return 'none';
 }
